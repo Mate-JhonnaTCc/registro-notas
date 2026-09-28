@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Registro de Notas</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --navy:#1B2A41; --navy-2:#25405e; --paper:#F7F5EF; --paper-2:#ECE7DA;
+  --ink:#20232b; --amber:#D9A441; --green:#2f6b4a; --red:#B4443D; --line:#D8D2C2;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Georgia,'Times New Roman',serif;background:var(--paper);color:var(--ink);}
+.app{display:flex;min-height:100vh}
+nav{background:var(--navy);color:#fff;width:200px;flex:0 0 200px;padding:24px 0;position:sticky;top:0;height:100vh}
+nav h1{font-size:1.0rem;padding:0 20px 18px;margin:0 0 10px;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.3}
+nav button{display:block;width:100%;text-align:left;background:none;border:none;color:#cdd6e0;padding:12px 20px;font-family:Georgia,serif;font-size:.95rem;cursor:pointer;border-left:3px solid transparent}
+nav button.active{color:#fff;background:var(--navy-2);border-left-color:var(--amber)}
+nav button:hover{color:#fff}
+nav .signout{margin-top:auto;opacity:.7;font-size:.8rem}
+main{flex:1;padding:32px 40px;max-width:1080px}
+h2{font-size:1.5rem;margin:0 0 4px;font-weight:600}
+h3{font-size:1.1rem;margin:18px 0 6px;color:var(--navy)}
+.sub{color:#6b7280;font-family:'Segoe UI',Arial,sans-serif;font-size:.88rem;margin-bottom:22px}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:end;margin-bottom:18px}
+label{font-family:'Segoe UI',Arial,sans-serif;font-size:.78rem;color:#555;display:block;margin-bottom:4px}
+select,input{font-family:'Segoe UI',Arial,sans-serif;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:#fff;font-size:.9rem}
+button.btn{font-family:'Segoe UI',Arial,sans-serif;background:var(--navy);color:#fff;border:none;padding:9px 16px;border-radius:4px;cursor:pointer;font-size:.88rem}
+button.btn:hover{background:var(--navy-2)}
+button.btn.ghost{background:none;color:var(--navy);border:1px solid var(--navy)}
+button.btn.danger{background:none;color:var(--red);border:1px solid var(--red);padding:5px 10px;font-size:.78rem}
+table{width:100%;border-collapse:collapse;background:#fff;font-family:'Segoe UI',Arial,sans-serif;font-size:.85rem}
+th,td{padding:8px 9px;border-bottom:1px solid var(--paper-2);text-align:left}
+th{background:var(--paper-2);font-weight:600;font-size:.74rem;color:#444}
+tr:hover td{background:#fbfaf6}
+.nota-in{width:56px}
+.aprob{color:var(--green);font-weight:600}
+.desaprob{color:var(--red);font-weight:600}
+.card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:18px 20px;margin-bottom:16px}
+.stat{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:18px}
+.stat div{background:#fff;border:1px solid var(--line);border-radius:6px;padding:14px 20px;min-width:140px;font-family:'Segoe UI',Arial,sans-serif}
+.stat b{display:block;font-size:1.6rem;font-family:Georgia,serif;color:var(--navy)}
+.stat span{font-size:.75rem;color:#777}
+.bar-row{display:flex;align-items:center;gap:10px;margin:6px 0;font-family:'Segoe UI',Arial,sans-serif;font-size:.82rem}
+.bar-label{width:190px;flex:0 0 190px}
+.bar-track{flex:1;background:var(--paper-2);border-radius:3px;height:16px;overflow:hidden}
+.bar-fill{height:100%;background:var(--amber)}
+.empty{color:#888;font-family:'Segoe UI',Arial,sans-serif;font-style:italic;padding:30px 0;text-align:center}
+.tabbar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.tabbar button{font-family:'Segoe UI',Arial,sans-serif;background:none;border:1px solid var(--line);padding:7px 14px;border-radius:14px;cursor:pointer;font-size:.82rem;color:#555}
+.tabbar button.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.rpt-head{text-align:center;margin-bottom:14px}
+.rpt-head h3{margin:0 0 2px;font-size:1.3rem}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--navy)}
+.login-card{background:#fff;border-radius:8px;padding:36px 40px;width:320px;font-family:'Segoe UI',Arial,sans-serif}
+.login-card h2{font-family:Georgia,serif;color:var(--navy);margin-top:0}
+.login-card input{width:100%;margin-bottom:12px}
+.login-err{color:var(--red);font-size:.82rem;margin-top:8px;min-height:1em}
+@media print{ nav,.no-print{display:none!important} main{padding:0;max-width:none} .app{display:block} }
+@media (max-width:760px){
+  .app{flex-direction:column}
+  nav{width:100%;height:auto;position:static;display:flex;overflow-x:auto;padding:10px 0}
+  nav h1{display:none} nav button{white-space:nowrap;border-left:none;border-bottom:3px solid transparent}
+  nav button.active{border-bottom-color:var(--amber)}
+  main{padding:20px}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+/* ======= CONFIGURA ESTOS DOS VALORES CON LOS DE TU PROYECTO SUPABASE ======= */
+const SUPABASE_URL = 'https://TU-PROYECTO.supabase.co';
+const SUPABASE_ANON_KEY = 'TU-ANON-KEY';
+/* ============================================================================ */
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const CURSOS=['Aritmética','Geometría','Trigonometría','Razonamiento Matemático','Álgebra'];
+const BIMS=[1,2,3,4];
+const BIM_LABEL={1:'I',2:'II',3:'III',4:'IV'};
+const APROB=11;
+const GRADO_LABEL={1:'1° de Secundaria',2:'2° de Secundaria',3:'3° de Secundaria',4:'4° de Secundaria',5:'5° de Secundaria'};
+
+let DATA={students:[],records:{}};
+let session=null;
+
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function estadoClass(p){return p===null?'':(p>=APROB?'aprob':'desaprob');}
+function uid(){return 's'+Math.random().toString(36).slice(2,9);}
+function avg2(a,b){const v=[a,b].filter(x=>x!==null&&x!==undefined);return v.length?v.reduce((x,y)=>x+y,0)/v.length:null;}
+function computeProm(r){
+  if(!r)return null;
+  const cu=avg2(r.cN1,r.cN2), li=avg2(r.lN1,r.lN2), co=avg2(r.conN1,r.conN2);
+  const comps=[cu,li,co,r.exM??null,r.exB??null].filter(v=>v!==null&&v!==undefined);
+  if(!comps.length)return null;
+  return Math.ceil(comps.reduce((a,b)=>a+b,0)/comps.length);
+}
+function getRec(sid,curso,bim){return (DATA.records[sid]&&DATA.records[sid][curso]&&DATA.records[sid][curso][bim])||null;}
+function promAlumnoCurso(sid,curso,bim){return computeProm(getRec(sid,curso,bim));}
+function promAlumnoGeneral(sid,bim){
+  const vals=CURSOS.map(c=>promAlumnoCurso(sid,c,bim)).filter(v=>v!==null);
+  return vals.length? Math.round((vals.reduce((a,b)=>a+b,0)/vals.length)*100)/100 : null;
+}
+function grados(){return[...new Set(DATA.students.map(s=>s.grado))].sort((a,b)=>a-b);}
+function studentsOf(g){return DATA.students.filter(s=>s.grado==g).sort((a,b)=>a.nombre.localeCompare(b.nombre));}
+
+/* ---------- Carga de datos desde Supabase ---------- */
+async function loadAllData(){
+  const {data:studs,error:e1} = await sb.from('students').select('*');
+  const {data:grds,error:e2} = await sb.from('grades').select('*');
+  if(e1||e2){ alert('Error cargando datos: '+((e1||e2).message)); return; }
+  DATA.students = studs.map(s=>({id:s.id,nombre:s.nombre,grado:s.grado}));
+  DATA.records = {};
+  grds.forEach(r=>{
+    DATA.records[r.sid]=DATA.records[r.sid]||{};
+    DATA.records[r.sid][r.curso]=DATA.records[r.sid][r.curso]||{};
+    DATA.records[r.sid][r.curso][r.bim]={cN1:r.c_n1,cN2:r.c_n2,lN1:r.l_n1,lN2:r.l_n2,conN1:r.con_n1,conN2:r.con_n2,exM:r.ex_m,exB:r.ex_b};
+  });
+}
+async function upsertGradeRow(sid,curso,bim){
+  const r=getRec(sid,curso,bim)||{};
+  const {error}=await sb.from('grades').upsert({
+    sid,curso,bim,c_n1:r.cN1??null,c_n2:r.cN2??null,l_n1:r.lN1??null,l_n2:r.lN2??null,
+    con_n1:r.conN1??null,con_n2:r.conN2??null,ex_m:r.exM??null,ex_b:r.exB??null
+  },{onConflict:'sid,curso,bim'});
+  if(error) alert('Error guardando: '+error.message);
+}
+async function insertStudent(nombre,grado){
+  const id=uid();
+  const {error}=await sb.from('students').insert({id,nombre,grado});
+  if(error){ alert('Error agregando alumno: '+error.message); return null; }
+  DATA.students.push({id,nombre,grado});
+  return id;
+}
+async function deleteStudentRemote(id){
+  const {error}=await sb.from('students').delete().eq('id',id);
+  if(error){ alert('Error eliminando: '+error.message); return; }
+  DATA.students=DATA.students.filter(s=>s.id!==id);
+  delete DATA.records[id];
+}
+function setField(sid,curso,bim,field,val){
+  DATA.records[sid]=DATA.records[sid]||{};
+  DATA.records[sid][curso]=DATA.records[sid][curso]||{};
+  DATA.records[sid][curso][bim]=DATA.records[sid][curso][bim]||{};
+  DATA.records[sid][curso][bim][field]= val===''? null : Math.max(0,Math.min(20,Number(val)));
+}
+
+/* ---------- Login ---------- */
+function renderLogin(err){
+  document.getElementById('root').innerHTML=`
+  <div class="login-wrap"><div class="login-card">
+    <h2>Registro de Notas</h2>
+    <div class="sub" style="font-family:'Segoe UI',Arial,sans-serif;color:#666;margin-bottom:16px">Colegio Los Ángeles de Jesús</div>
+    <label>Correo</label><input id="loginEmail" type="email">
+    <label>Contraseña</label><input id="loginPass" type="password">
+    <button class="btn" id="loginBtn" style="width:100%">Ingresar</button>
+    <div class="login-err">${err||''}</div>
+  </div></div>`;
+  document.getElementById('loginBtn').onclick=async()=>{
+    const email=document.getElementById('loginEmail').value.trim();
+    const password=document.getElementById('loginPass').value;
+    const {data,error}=await sb.auth.signInWithPassword({email,password});
+    if(error){ renderLogin(error.message); return; }
+    session=data.session;
+    await loadAllData();
+    tab='estudiantes'; render();
+  };
+}
+
+/* ---------- Layout / tabs ---------- */
+let tab='estudiantes';
+function renderShell(){
+  document.getElementById('root').innerHTML=`
+  <div class="app">
+  <nav>
+    <h1>Registro de Notas<br><span style="opacity:.6;font-size:.75rem">Los Ángeles de Jesús</span></h1>
+    <button data-tab="estudiantes">Estudiantes</button>
+    <button data-tab="registro">Registro de notas</button>
+    <button data-tab="analisis">Análisis</button>
+    <button data-tab="reportes">Reportes</button>
+    <button class="signout no-print" id="signOutBtn" style="margin-top:20px;background:none;border:none;color:#cdd6e0;text-align:left;padding:12px 20px;cursor:pointer">Cerrar sesión</button>
+  </nav>
+  <main id="main"></main>
+  </div>`;
+  document.querySelectorAll('nav button[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render();});
+  document.getElementById('signOutBtn').onclick=async()=>{await sb.auth.signOut();session=null;renderLogin();};
+}
+
+function render(){
+  renderShell();
+  document.querySelectorAll('nav button[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  const m=document.getElementById('main');
+  if(tab==='estudiantes')m.innerHTML=viewEstudiantes();
+  if(tab==='registro')m.innerHTML=viewRegistro();
+  if(tab==='analisis')m.innerHTML=viewAnalisis();
+  if(tab==='reportes')m.innerHTML=viewReportes();
+  wire();
+}
+
+function viewEstudiantes(){
+  const rows=[...DATA.students].sort((a,b)=>a.grado-b.grado||a.nombre.localeCompare(b.nombre))
+    .map(s=>`<tr><td>${esc(s.nombre)}</td><td>${s.grado}°</td>
+    <td><button class="btn danger" data-del="${s.id}">Eliminar</button></td></tr>`).join('');
+  return `<h2>Estudiantes</h2><div class="sub">${DATA.students.length} alumnos cargados (1° a 5° de secundaria) — datos en la nube (Supabase).</div>
+  <div class="card"><div class="row">
+    <div><label>Nombre completo</label><input id="nName" placeholder="Nombre y apellidos"></div>
+    <div><label>Grado</label><select id="nGrado">${[1,2,3,4,5].map(g=>`<option value="${g}">${g}°</option>`).join('')}</select></div>
+    <button class="btn" id="addStudent">Agregar alumno</button>
+  </div></div>
+  <div class="card">
+    <b style="font-family:Georgia,serif">Respaldo en Excel</b>
+    <div class="sub" style="margin:6px 0 12px">Descarga tus alumnos y notas a un Excel, o sube un Excel con la misma estructura para actualizar la nube.</div>
+    <div class="row" style="margin-bottom:0">
+      <button class="btn ghost" id="exportXlsx">Exportar a Excel</button>
+      <div><label>Importar Excel (hoja "Notas")</label><input type="file" id="importXlsx" accept=".xlsx,.xls"></div>
+    </div>
+    <div id="importMsg" class="sub" style="margin:8px 0 0">${window._importMsg||''}</div>
+  </div>
+  <table><thead><tr><th>Nombre</th><th>Grado</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function fieldInput(sid,curso,bim,field,val){
+  return `<input type="number" min="0" max="20" class="nota-in" data-sid="${sid}" data-field="${field}" value="${val??''}">`;
+}
+
+function viewRegistro(){
+  const gs=grados();
+  const g=window._rg||gs[0], curso=window._rc||CURSOS[0], bim=window._rb||3;
+  const list=studentsOf(g);
+  const rows=list.map(s=>{
+    const r=getRec(s.id,curso,bim)||{};
+    const prom=promAlumnoCurso(s.id,curso,bim);
+    return `<tr>
+      <td>${esc(s.nombre)}</td>
+      <td>${fieldInput(s.id,curso,bim,'cN1',r.cN1)}</td><td>${fieldInput(s.id,curso,bim,'cN2',r.cN2)}</td>
+      <td>${fieldInput(s.id,curso,bim,'lN1',r.lN1)}</td><td>${fieldInput(s.id,curso,bim,'lN2',r.lN2)}</td>
+      <td>${fieldInput(s.id,curso,bim,'conN1',r.conN1)}</td><td>${fieldInput(s.id,curso,bim,'conN2',r.conN2)}</td>
+      <td>${fieldInput(s.id,curso,bim,'exM',r.exM)}</td><td>${fieldInput(s.id,curso,bim,'exB',r.exB)}</td>
+      <td class="${estadoClass(prom)}">${prom??'—'}</td>
+    </tr>`;
+  }).join('');
+  return `<h2>Registro de notas</h2><div class="sub">El Promedio se calcula solo (redondeado hacia arriba). Al guardar, se sube directo a la nube.</div>
+  <div class="row">
+    <div><label>Grado</label><select id="rGrado">${gs.map(x=>`<option value="${x}" ${x==g?'selected':''}>${x}°</option>`).join('')}</select></div>
+    <div><label>Curso</label><select id="rCurso">${CURSOS.map(c=>`<option ${c==curso?'selected':''}>${esc(c)}</option>`).join('')}</select></div>
+    <div><label>Bimestre</label><select id="rBim">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
+  </div>
+  ${list.length?`<div style="overflow-x:auto"><table><thead><tr><th>Alumno</th><th>Cuad. N1</th><th>Cuad. N2</th><th>Libro N1</th><th>Libro N2</th><th>Cond. N1</th><th>Cond. N2</th><th>Ex.Mensual</th><th>Ex.Bimestral</th><th>Promedio</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <div style="margin-top:14px"><button class="btn" id="saveGrades">Guardar notas</button></div>`
+  :'<div class="empty">No hay alumnos en ese grado.</div>'}`;
+}
+
+function viewAnalisis(){
+  const gs=grados();
+  const modo=window._am||'alumno';
+  let body='';
+  if(modo==='alumno'){
+    const all=[...DATA.students].sort((a,b)=>a.grado-b.grado||a.nombre.localeCompare(b.nombre));
+    const sid=window._aSid||(all[0]&&all[0].id);
+    const bim=window._aBim||3;
+    body=`<div class="row">
+      <div><label>Alumno</label><select id="aSid">${all.map(s=>`<option value="${s.id}" ${s.id==sid?'selected':''}>${esc(s.nombre)} (${s.grado}°)</option>`).join('')}</select></div>
+      <div><label>Bimestre</label><select id="aBim">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
+    </div>`;
+    if(sid){
+      const rowsC=CURSOS.map(c=>{
+        const prom=promAlumnoCurso(sid,c,bim);
+        return `<tr><td>${esc(c)}</td><td class="${estadoClass(prom)}">${prom??'—'}</td></tr>`;
+      }).join('');
+      const gen=promAlumnoGeneral(sid,bim);
+      body+=`<table><thead><tr><th>Curso</th><th>Promedio ${BIM_LABEL[bim]} Bim.</th></tr></thead><tbody>${rowsC}</tbody></table>
+      <div class="stat"><div><b class="${estadoClass(gen)}">${gen??'—'}</b><span>Promedio general</span></div></div>`;
+    }
+  }
+  if(modo==='curso'){
+    const curso=window._aCurso||CURSOS[0], g=window._aGrado||'', bim=window._acBim||3;
+    body=`<div class="row">
+      <div><label>Curso</label><select id="aCurso">${CURSOS.map(c=>`<option ${c==curso?'selected':''}>${esc(c)}</option>`).join('')}</select></div>
+      <div><label>Grado (opcional)</label><select id="aGrado"><option value="">Todos</option>${gs.map(x=>`<option value="${x}" ${x==g?'selected':''}>${x}°</option>`).join('')}</select></div>
+      <div><label>Bimestre</label><select id="acBim">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
+    </div>`;
+    const list=g?studentsOf(g):[...DATA.students];
+    const proms=list.map(s=>({s,p:promAlumnoCurso(s.id,curso,bim)})).filter(x=>x.p!==null);
+    const aprobados=proms.filter(x=>x.p>=APROB).length;
+    const clase=proms.length?Math.round((proms.reduce((a,x)=>a+x.p,0)/proms.length)*100)/100:null;
+    const rows=proms.sort((a,b)=>b.p-a.p).map(x=>`<tr><td>${esc(x.s.nombre)}</td><td>${x.s.grado}°</td><td class="${estadoClass(x.p)}">${x.p}</td></tr>`).join('');
+    body+=`<div class="stat">
+      <div><b>${clase??'—'}</b><span>Promedio del curso</span></div>
+      <div><b>${aprobados}/${proms.length}</b><span>Aprobados</span></div>
+    </div>
+    ${proms.length?`<table><thead><tr><th>Alumno</th><th>Grado</th><th>Promedio</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">Sin notas registradas para este curso y bimestre.</div>'}`;
+  }
+  if(modo==='grado'){
+    const g=window._agGrado||gs[0], bim=window._agBim||3;
+    body=`<div class="row">
+      <div><label>Grado</label><select id="agGrado">${gs.map(x=>`<option value="${x}" ${x==g?'selected':''}>${x}°</option>`).join('')}</select></div>
+      <div><label>Bimestre</label><select id="agBimS">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
+    </div>`;
+    const list=studentsOf(g);
+    const bars=CURSOS.map(c=>{
+      const proms=list.map(s=>promAlumnoCurso(s.id,c,bim)).filter(v=>v!==null);
+      const prom=proms.length?Math.round((proms.reduce((a,b)=>a+b,0)/proms.length)*100)/100:0;
+      return `<div class="bar-row"><div class="bar-label">${esc(c)}</div><div class="bar-track"><div class="bar-fill" style="width:${prom/20*100}%"></div></div><div>${prom||'—'}</div></div>`;
+    }).join('');
+    const gens=list.map(s=>promAlumnoGeneral(s.id,bim)).filter(v=>v!==null);
+    const genGrado=gens.length?Math.round((gens.reduce((a,b)=>a+b,0)/gens.length)*100)/100:null;
+    const enRiesgo=list.filter(s=>{const gp=promAlumnoGeneral(s.id,bim);return gp!==null&&gp<APROB;}).length;
+    body+=`<div class="stat">
+      <div><b class="${estadoClass(genGrado)}">${genGrado??'—'}</b><span>Promedio general del grado</span></div>
+      <div><b>${list.length}</b><span>Alumnos</span></div>
+      <div><b class="${enRiesgo?'desaprob':''}">${enRiesgo}</b><span>En riesgo (prom. &lt; ${APROB})</span></div>
+    </div>
+    <div class="card"><b style="font-family:Georgia,serif">Promedio por curso — ${g}°</b><div style="margin-top:12px">${bars}</div></div>`;
+  }
+  return `<h2>Análisis</h2><div class="sub">Explora el desempeño por alumno, por curso o por grado.</div>
+  <div class="tabbar">
+    <button data-am="alumno" class="${modo==='alumno'?'active':''}">Por alumno</button>
+    <button data-am="curso" class="${modo==='curso'?'active':''}">Por curso</button>
+    <button data-am="grado" class="${modo==='grado'?'active':''}">Por grado</button>
+  </div>${body}`;
+}
+
+function viewReportes(){
+  const gs=grados();
+  const modo=window._rm||'curso';
+  let body='';
+  if(modo==='curso'){
+    const g=window._repG||gs[0], curso=window._repC||CURSOS[0], bim=window._repB||3;
+    const list=studentsOf(g);
+    const rows=list.map((s,i)=>{
+      const r=getRec(s.id,curso,bim);
+      const cu=r?avg2(r.cN1,r.cN2):null, li=r?avg2(r.lN1,r.lN2):null, co=r?avg2(r.conN1,r.conN2):null;
+      const prom=promAlumnoCurso(s.id,curso,bim);
+      const estado=prom===null?'—':(prom>=APROB?'Aprobado':'Desaprobado');
+      return `<tr><td>${i+1}</td><td>${esc(s.nombre)}</td><td>${cu??'—'}</td><td>${li??'—'}</td><td>${co??'—'}</td>
+      <td>${r?.exM??'—'}</td><td>${r?.exB??'—'}</td><td class="${estadoClass(prom)}">${prom??'—'}</td><td class="${estadoClass(prom)}">${estado}</td></tr>`;
+    }).join('');
+    body=`<div class="row no-print">
+      <div><label>Grado</label><select id="repG">${gs.map(x=>`<option value="${x}" ${x==g?'selected':''}>${x}°</option>`).join('')}</select></div>
+      <div><label>Curso</label><select id="repC">${CURSOS.map(c=>`<option ${c==curso?'selected':''}>${esc(c)}</option>`).join('')}</select></div>
+      <div><label>Bimestre</label><select id="repB">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
+      <button class="btn ghost" id="printBtn">Imprimir / Guardar PDF</button>
+    </div>
+    <div class="rpt-head"><h3>Registro Auxiliar de ${esc(curso)}</h3><div class="sub">${BIM_LABEL[bim]} Bimestre — ${g}° de Secundaria · Colegio Los Ángeles de Jesús</div></div>
+    ${list.length?`<table><thead><tr><th>N°</th><th>Alumno</th><th>Cuaderno</th><th>Libro</th><th>Conducta</th><th>Ex. Mensual</th><th>Ex. Bimestral</th><th>Promedio</th><th>Estado</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">Sin alumnos en ese grado.</div>'}`;
+  }else{
+    const g=window._repGG||gs[0], bim=window._repGB||3;
+    const list=studentsOf(g);
+    const rows=list.map((s,i)=>{
+      const cells=CURSOS.map(c=>{const p=promAlumnoCurso(s.id,c,bim);return `<td class="${estadoClass(p)}">${p??'—'}</td>`}).join('');
+      const gen=promAlumnoGeneral(s.id,bim);
+      return `<tr><td>${i+1}</td><td>${esc(s.nombre)}</td>${cells}<td class="${estadoClass(gen)}">${gen??'—'}</td></tr>`;
+    }).join('');
+    body=`<div class="row no-print">
+      <div><label>Grado</label><select id="repGG">${gs.map(x=>`<option value="${x}" ${x==g?'selected':''}>${x}°</option>`).join('')}</select></div>
+      <div><label>Bimestre</label><select id="repGB">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
+      <button class="btn ghost" id="printBtn2">Imprimir / Guardar PDF</button>
+    </div>
+    <div class="rpt-head"><h3>Consolidado de Notas — ${g}° de Secundaria</h3><div class="sub">${BIM_LABEL[bim]} Bimestre · Colegio Los Ángeles de Jesús</div></div>
+    ${list.length?`<table><thead><tr><th>N°</th><th>Alumno</th>${CURSOS.map(c=>`<th>${esc(c)}</th>`).join('')}<th>Prom. Gen.</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">Sin alumnos en ese grado.</div>'}`;
+  }
+  return `<h2>Reportes</h2><div class="sub no-print">Genera el registro por curso o el consolidado por grado, listos para imprimir o exportar a PDF.</div>
+  <div class="tabbar no-print">
+    <button data-rm="curso" class="${modo==='curso'?'active':''}">Por curso</button>
+    <button data-rm="grado" class="${modo==='grado'?'active':''}">Consolidado por grado</button>
+  </div>${body}`;
+}
+
+function wire(){
+  const m=document.getElementById('main');
+  const addS=document.getElementById('addStudent');
+  if(addS)addS.onclick=async()=>{
+    const name=document.getElementById('nName').value.trim();
+    const g=Number(document.getElementById('nGrado').value);
+    if(!name)return;
+    addS.disabled=true;
+    await insertStudent(name,g);
+    render();
+  };
+  m.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{
+    if(!confirm('¿Eliminar este alumno y sus notas?'))return;
+    await deleteStudentRemote(b.dataset.del); render();
+  });
+  const rGrado=document.getElementById('rGrado'), rCurso=document.getElementById('rCurso'), rBim=document.getElementById('rBim');
+  [rGrado,rCurso,rBim].forEach(el=>{if(!el)return;el.onchange=()=>{
+    window._rg=Number(rGrado.value); window._rc=rCurso.value; window._rb=Number(rBim.value); render();
+  };});
+  const sg=document.getElementById('saveGrades');
+  if(sg)sg.onclick=async()=>{
+    const g=window._rg||grados()[0], curso=window._rc||CURSOS[0], bim=window._rb||3;
+    sg.textContent='Guardando...'; sg.disabled=true;
+    const list=studentsOf(g);
+    m.querySelectorAll('.nota-in').forEach(inp=>setField(inp.dataset.sid,curso,bim,inp.dataset.field,inp.value));
+    for(const s of list){ await upsertGradeRow(s.id,curso,bim); }
+    sg.textContent='Guardado ✓'; setTimeout(()=>render(),500);
+  };
+  m.querySelectorAll('[data-am]').forEach(b=>b.onclick=()=>{window._am=b.dataset.am;render();});
+  const aS=document.getElementById('aSid'), aB=document.getElementById('aBim');
+  if(aS)aS.onchange=()=>{window._aSid=aS.value; if(aB)window._aBim=Number(aB.value); render();};
+  if(aB)aB.onchange=()=>{window._aBim=Number(aB.value); if(aS)window._aSid=aS.value; render();};
+  const aC=document.getElementById('aCurso'), aG=document.getElementById('aGrado'), acB=document.getElementById('acBim');
+  [aC,aG,acB].forEach(el=>{if(!el)return;el.onchange=()=>{window._aCurso=aC.value;window._aGrado=aG.value;window._acBim=Number(acB.value);render();};});
+  const agG=document.getElementById('agGrado'), agB=document.getElementById('agBimS');
+  [agG,agB].forEach(el=>{if(!el)return;el.onchange=()=>{window._agGrado=Number(agG.value);window._agBim=Number(agB.value);render();};});
+  m.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{window._rm=b.dataset.rm;render();});
+  const repG=document.getElementById('repG'), repC=document.getElementById('repC'), repB=document.getElementById('repB');
+  [repG,repC,repB].forEach(el=>{if(!el)return;el.onchange=()=>{window._repG=Number(repG.value);window._repC=repC.value;window._repB=Number(repB.value);render();};});
+  const repGG=document.getElementById('repGG'), repGB=document.getElementById('repGB');
+  [repGG,repGB].forEach(el=>{if(!el)return;el.onchange=()=>{window._repGG=Number(repGG.value);window._repGB=Number(repGB.value);render();};});
+  const pb=document.getElementById('printBtn');if(pb)pb.onclick=()=>window.print();
+  const pb2=document.getElementById('printBtn2');if(pb2)pb2.onclick=()=>window.print();
+  const exBtn=document.getElementById('exportXlsx');if(exBtn)exBtn.onclick=exportExcel;
+  const imIn=document.getElementById('importXlsx');if(imIn)imIn.onchange=e=>importExcel(e.target.files[0]);
+}
+
+function exportExcel(){
+  const wb=XLSX.utils.book_new();
+  const alumRows=[['N°','Nombre','Grado']];
+  DATA.students.forEach((s,i)=>alumRows.push([i+1,s.nombre,GRADO_LABEL[s.grado]||s.grado]));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(alumRows),'Alumnos');
+  const notasHead=['Bimestre','Grado','Curso','Alumno','Cuaderno N1','Cuaderno N2','Libro N1','Libro N2','Conducta N1','Conducta N2','Examen Mensual','Examen Bimestral','Promedio','Estado'];
+  const notasRows=[notasHead];
+  DATA.students.forEach(s=>{
+    CURSOS.forEach(c=>{
+      BIMS.forEach(b=>{
+        const r=getRec(s.id,c,b);
+        if(!r)return;
+        const prom=computeProm(r);
+        const estado=prom===null?'':(prom>=APROB?'Aprobado':'Desaprobado');
+        notasRows.push([b,GRADO_LABEL[s.grado]||s.grado,c,s.nombre,r.cN1,r.cN2,r.lN1,r.lN2,r.conN1,r.conN2,r.exM,r.exB,prom,estado]);
+      });
+    });
+  });
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(notasRows),'Notas');
+  XLSX.writeFile(wb,'Notas_Los_Angeles_de_Jesus.xlsx');
+}
+
+function parseGradoNum(v){ const m=String(v).match(/\d+/); return m?Number(m[0]):null; }
+async function findOrCreateStudentRemote(nombre,grado){
+  const nn=String(nombre).trim().toLowerCase();
+  let s=DATA.students.find(x=>x.grado==grado && x.nombre.trim().toLowerCase()===nn);
+  if(!s){ const id=await insertStudent(String(nombre).trim(),grado); s=DATA.students.find(x=>x.id===id); }
+  return s;
+}
+async function importExcel(file){
+  if(!file)return;
+  try{
+    const buf=await file.arrayBuffer();
+    const wb=XLSX.read(buf,{type:'array'});
+    const sheetName=wb.SheetNames.find(n=>n.toLowerCase()==='notas')||wb.SheetNames[0];
+    const ws=wb.Sheets[sheetName];
+    const rows=XLSX.utils.sheet_to_json(ws,{defval:null});
+    let n=0;
+    for(const r of rows){
+      const alumno=r['Alumno']; const grado=parseGradoNum(r['Grado']); const curso=r['Curso']; const bim=Number(r['Bimestre']);
+      if(!alumno||!grado||!curso||!bim)continue;
+      const s=await findOrCreateStudentRemote(alumno,grado);
+      const clean=v=>(v===null||v===undefined||v==='')?null:Number(v);
+      DATA.records[s.id]=DATA.records[s.id]||{};
+      DATA.records[s.id][curso]=DATA.records[s.id][curso]||{};
+      DATA.records[s.id][curso][bim]={
+        cN1:clean(r['Cuaderno N1']),cN2:clean(r['Cuaderno N2']),
+        lN1:clean(r['Libro N1']),lN2:clean(r['Libro N2']),
+        conN1:clean(r['Conducta N1']),conN2:clean(r['Conducta N2']),
+        exM:clean(r['Examen Mensual']),exB:clean(r['Examen Bimestral'])
+      };
+      await upsertGradeRow(s.id,curso,bim);
+      n++;
+    }
+    window._importMsg=`Importación completa: ${n} registros de notas actualizados en la nube.`;
+    render();
+  }catch(e){
+    window._importMsg='No se pudo leer ese archivo. Verifica que tenga una hoja "Notas" con las columnas Bimestre, Grado, Curso, Alumno y las notas.';
+    render();
+  }
+}
+
+/* ---------- Arranque ---------- */
+(async function start(){
+  const {data:{session:s}}=await sb.auth.getSession();
+  if(s){ session=s; await loadAllData(); render(); }
+  else { renderLogin(); }
+})();
+</script>
+</body>
+</html>
