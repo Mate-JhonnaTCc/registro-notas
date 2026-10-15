@@ -6,6 +6,8 @@
 <title>Registro de Notas</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
 :root{
   --navy:#1B2A41; --navy-2:#25405e; --paper:#F7F5EF; --paper-2:#ECE7DA;
@@ -35,7 +37,7 @@ table{width:100%;border-collapse:collapse;background:#fff;font-family:'Segoe UI'
 th,td{padding:8px 9px;border-bottom:1px solid var(--paper-2);text-align:left}
 th{background:var(--paper-2);font-weight:600;font-size:.74rem;color:#444}
 tr:hover td{background:#fbfaf6}
-.nota-in{width:56px}
+.nota-in,.nota-al{width:56px}
 .aprob{color:var(--green);font-weight:600}
 .desaprob{color:var(--red);font-weight:600}
 .card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:18px 20px;margin-bottom:16px}
@@ -58,7 +60,8 @@ tr:hover td{background:#fbfaf6}
 .login-card h2{font-family:Georgia,serif;color:var(--navy);margin-top:0}
 .login-card input{width:100%;margin-bottom:12px}
 .login-err{color:var(--red);font-size:.82rem;margin-top:8px;min-height:1em}
-@media print{ nav,.no-print{display:none!important} main{padding:0;max-width:none} .app{display:block} }
+@page{size:A4 landscape;margin:0}
+@media print{ nav,.no-print{display:none!important} main{padding:12mm;max-width:none} .app{display:block} }
 @media (max-width:760px){
   .app{flex-direction:column}
   nav{width:100%;height:auto;position:static;display:flex;overflow-x:auto;padding:10px 0}
@@ -72,8 +75,8 @@ tr:hover td{background:#fbfaf6}
 <div id="root"></div>
 <script>
 /* ======= CONFIGURA ESTOS DOS VALORES CON LOS DE TU PROYECTO SUPABASE ======= */
-const SUPABASE_URL = 'https://TU-PROYECTO.supabase.co';
-const SUPABASE_ANON_KEY = 'TU-ANON-KEY';
+const SUPABASE_URL = 'https://veweurnswptrraqkript.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZld2V1cm5zd3B0cnJhcWtyaXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1OTMwMTksImV4cCI6MjEwNjE2OTAxOX0.xAF7cH6k79jxMUxAqHrRjPZD21XJNZrHGm1jAH55ppo';
 /* ============================================================================ */
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -104,6 +107,14 @@ function promAlumnoGeneral(sid,bim){
   const vals=CURSOS.map(c=>promAlumnoCurso(sid,c,bim)).filter(v=>v!==null);
   return vals.length? Math.round((vals.reduce((a,b)=>a+b,0)/vals.length)*100)/100 : null;
 }
+const CAMPOS=['cN1','cN2','lN1','lN2','conN1','conN2','exM','exB'];
+function pctLleno(r){
+  if(!r)return 0;
+  const n=CAMPOS.filter(c=>r[c]!==null&&r[c]!==undefined&&r[c]!=='').length;
+  return Math.round(n/CAMPOS.length*100);
+}
+function pctColor(p){return p>=100?'var(--green)':(p===0?'var(--red)':'#b7791f');}
+function pctCell(sid,p){return `<td id="pct-${sid}" style="font-weight:600;color:${pctColor(p)}">${p}%</td>`;}
 function grados(){return[...new Set(DATA.students.map(s=>s.grado))].sort((a,b)=>a-b);}
 function studentsOf(g){return DATA.students.filter(s=>s.grado==g).sort((a,b)=>a.nombre.localeCompare(b.nombre));}
 
@@ -149,19 +160,34 @@ function setField(sid,curso,bim,field,val){
 }
 
 /* ---------- Login ---------- */
-function renderLogin(err){
+function renderLogin(err,mode,info){
+  mode=mode||'login';
+  const isReg=mode==='registro';
   document.getElementById('root').innerHTML=`
   <div class="login-wrap"><div class="login-card">
     <h2>Registro de Notas</h2>
     <div class="sub" style="font-family:'Segoe UI',Arial,sans-serif;color:#666;margin-bottom:16px">Colegio Los Ángeles de Jesús</div>
     <label>Correo</label><input id="loginEmail" type="email">
-    <label>Contraseña</label><input id="loginPass" type="password">
-    <button class="btn" id="loginBtn" style="width:100%">Ingresar</button>
+    <label>Contraseña${isReg?' (mínimo 6 caracteres)':''}</label><input id="loginPass" type="password">
+    ${isReg?'<label>Repite la contraseña</label><input id="loginPass2" type="password">':''}
+    <button class="btn" id="loginBtn" style="width:100%">${isReg?'Crear cuenta':'Ingresar'}</button>
     <div class="login-err">${err||''}</div>
+    ${info?`<div style="color:#2f6b4a;font-size:.85rem;margin-top:8px">${info}</div>`:''}
+    <div style="margin-top:14px;font-size:.85rem"><a href="#" id="toggleMode" style="color:#25405e">${isReg?'Ya tengo cuenta: ingresar':'¿No tienes cuenta? Crear cuenta'}</a></div>
   </div></div>`;
+  document.getElementById('toggleMode').onclick=e=>{e.preventDefault();renderLogin('',isReg?'login':'registro');};
   document.getElementById('loginBtn').onclick=async()=>{
     const email=document.getElementById('loginEmail').value.trim();
     const password=document.getElementById('loginPass').value;
+    if(isReg){
+      if(password.length<6){renderLogin('La contraseña debe tener al menos 6 caracteres.','registro');return;}
+      if(password!==document.getElementById('loginPass2').value){renderLogin('Las contraseñas no coinciden.','registro');return;}
+      const {data,error}=await sb.auth.signUp({email,password});
+      if(error){renderLogin(error.message,'registro');return;}
+      if(data.session){ session=data.session; await loadAllData(); tab='estudiantes'; render(); return; }
+      renderLogin('','login','Cuenta creada. Revisa tu correo y confirma el enlace; luego ingresa aquí.');
+      return;
+    }
     const {data,error}=await sb.auth.signInWithPassword({email,password});
     if(error){ renderLogin(error.message); return; }
     session=data.session;
@@ -226,7 +252,7 @@ function fieldInput(sid,curso,bim,field,val){
   return `<input type="number" min="0" max="20" class="nota-in" data-sid="${sid}" data-field="${field}" value="${val??''}">`;
 }
 
-function viewRegistro(){
+function viewRegistroCurso(){
   const gs=grados();
   const g=window._rg||gs[0], curso=window._rc||CURSOS[0], bim=window._rb||3;
   const list=studentsOf(g);
@@ -240,17 +266,120 @@ function viewRegistro(){
       <td>${fieldInput(s.id,curso,bim,'conN1',r.conN1)}</td><td>${fieldInput(s.id,curso,bim,'conN2',r.conN2)}</td>
       <td>${fieldInput(s.id,curso,bim,'exM',r.exM)}</td><td>${fieldInput(s.id,curso,bim,'exB',r.exB)}</td>
       <td class="${estadoClass(prom)}">${prom??'—'}</td>
+      ${pctCell(s.id,pctLleno(r))}
     </tr>`;
   }).join('');
-  return `<h2>Registro de notas</h2><div class="sub">El Promedio se calcula solo (redondeado hacia arriba). Al guardar, se sube directo a la nube.</div>
+  const completos=list.filter(s=>pctLleno(getRec(s.id,curso,bim))===100).length;
+  return `<div class="sub">El Promedio se calcula solo (redondeado hacia arriba). Al guardar, se sube directo a la nube.</div>
   <div class="row">
     <div><label>Grado</label><select id="rGrado">${gs.map(x=>`<option value="${x}" ${x==g?'selected':''}>${x}°</option>`).join('')}</select></div>
     <div><label>Curso</label><select id="rCurso">${CURSOS.map(c=>`<option ${c==curso?'selected':''}>${esc(c)}</option>`).join('')}</select></div>
     <div><label>Bimestre</label><select id="rBim">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
   </div>
-  ${list.length?`<div style="overflow-x:auto"><table><thead><tr><th>Alumno</th><th>Cuad. N1</th><th>Cuad. N2</th><th>Libro N1</th><th>Libro N2</th><th>Cond. N1</th><th>Cond. N2</th><th>Ex.Mensual</th><th>Ex.Bimestral</th><th>Promedio</th></tr></thead><tbody>${rows}</tbody></table></div>
+  ${list.length?`<div style="overflow-x:auto"><table><thead><tr><th>Alumno</th><th>Cuad. N1</th><th>Cuad. N2</th><th>Libro N1</th><th>Libro N2</th><th>Cond. N1</th><th>Cond. N2</th><th>Ex.Mensual</th><th>Ex.Bimestral</th><th>Promedio</th><th>% llenado</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <div class="sub" id="resumenLleno" style="margin:10px 0 0">${completos} de ${list.length} alumnos con todas sus notas completas.</div>
   <div style="margin-top:14px"><button class="btn" id="saveGrades">Guardar notas</button></div>`
   :'<div class="empty">No hay alumnos en ese grado.</div>'}`;
+}
+
+const ORD={1:'1.er',2:'2.º',3:'3.er',4:'4.º'};
+function cortoCurso(c){return c==='Razonamiento Matemático'?'Razonamiento Mat.':c;}
+function pendientesAlumno(sid,bim){
+  let algo=false; const cu=[], li=[];
+  const falta=(a,b)=>{const m=[]; if(a===null||a===undefined)m.push('N1'); if(b===null||b===undefined)m.push('N2'); return m;};
+  CURSOS.forEach(c=>{
+    const r=getRec(sid,c,bim)||{};
+    if(CAMPOS.some(k=>r[k]!==null&&r[k]!==undefined))algo=true;
+    const mc=falta(r.cN1,r.cN2), ml=falta(r.lN1,r.lN2);
+    if(mc.length)cu.push(`${cortoCurso(c)} (${mc.join(', ')})`);
+    if(ml.length)li.push(`${cortoCurso(c)} (${ml.join(', ')})`);
+  });
+  return {sinRegistro:!algo,cu,li};
+}
+function datosPendientes(g,bim){
+  const list=studentsOf(g);
+  const filas=list.map(s=>({s,...pendientesAlumno(s.id,bim)})).filter(x=>x.sinRegistro||x.cu.length||x.li.length);
+  return {filas,total:list.length,alDia:list.length-filas.length};
+}
+function viewRegistro(){
+  const modo=window._regMode||'curso';
+  const body=modo==='alumno'?viewRegistroAlumno():(modo==='pendientes'?viewPendientes():viewRegistroCurso());
+  return `<h2>Registro de notas</h2>
+  <div class="tabbar" style="margin-top:10px">
+    <button data-rmode="curso" class="${modo==='curso'?'active':''}">Ingreso por curso</button>
+    <button data-rmode="alumno" class="${modo==='alumno'?'active':''}">Ingreso por alumno</button>
+    <button data-rmode="pendientes" class="${modo==='pendientes'?'active':''}">Pendientes de entrega</button>
+  </div>${body}`;
+}
+function viewRegistroAlumno(){
+  const gs=grados();
+  const g=window._ra_g||gs[0], bim=window._ra_b||3;
+  const list=studentsOf(g);
+  let sid=window._ra_sid; if(!list.find(s=>s.id===sid))sid=list[0]&&list[0].id;
+  window._ra_sid=sid;
+  const ctrl=`<div class="row">
+    <div><label>Grado</label><select id="raGrado">${gs.map(x=>`<option value="${x}" ${x==g?'selected':''}>${x}°</option>`).join('')}</select></div>
+    <div><label>Alumno</label><select id="raSid">${list.map(s=>`<option value="${s.id}" ${s.id===sid?'selected':''}>${esc(s.nombre)}</option>`).join('')}</select></div>
+    <div><label>Bimestre</label><select id="raBim">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
+  </div>`;
+  if(!sid)return `<div class="sub">Registra las notas de un alumno en todos sus cursos.</div>${ctrl}<div class="empty">No hay alumnos en ese grado.</div>`;
+  const rows=CURSOS.map((c,i)=>{
+    const rec=getRec(sid,c,bim); const r=rec||{};
+    const prom=computeProm(rec); const p=pctLleno(rec);
+    const cells=CAMPOS.map(f=>`<td><input type="number" min="0" max="20" class="nota-al" data-curso="${esc(c)}" data-field="${f}" value="${r[f]??''}"></td>`).join('');
+    return `<tr><td><b>${esc(c)}</b></td>${cells}<td class="${estadoClass(prom)}">${prom??'—'}</td><td id="pa-${i}" style="font-weight:600;color:${pctColor(p)}">${p}%</td></tr>`;
+  }).join('');
+  return `<div class="sub">Registra las notas de un alumno en todos sus cursos. Al guardar, se sube directo a la nube.</div>${ctrl}
+  <div style="overflow-x:auto"><table><thead><tr><th>Curso</th><th>Cuad. N1</th><th>Cuad. N2</th><th>Libro N1</th><th>Libro N2</th><th>Cond. N1</th><th>Cond. N2</th><th>Ex.Mensual</th><th>Ex.Bimestral</th><th>Promedio</th><th>% llenado</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <div style="margin-top:14px"><button class="btn" id="saveAlumno">Guardar notas</button></div>`;
+}
+function viewPendientes(){
+  const gs=grados();
+  const g=window._pg||gs[0], bim=window._pb||3;
+  const {filas,total,alDia}=datosPendientes(g,bim);
+  const celda=(x,arr)=>x.sinRegistro?'<span style="color:var(--red);font-style:italic">Sin registro</span>':(arr.length?arr.map(esc).join('<br>'):'—');
+  const tabla=filas.length?`<table><thead><tr><th>Alumno</th><th>Cuadernos que faltan</th><th>Libros que faltan</th></tr></thead><tbody>${
+    filas.map(x=>`<tr><td style="vertical-align:top"><b>${esc(x.s.nombre)}</b></td><td style="vertical-align:top">${celda(x,x.cu)}</td><td style="vertical-align:top">${celda(x,x.li)}</td></tr>`).join('')
+  }</tbody></table>`:'<div class="empty">¡Todos los alumnos de este grado están al día!</div>';
+  return `<div class="row">
+    <div><label>Grado</label><select id="pdGrado">${gs.map(x=>`<option value="${x}" ${x==g?'selected':''}>${x}°</option>`).join('')}</select></div>
+    <div><label>Bimestre</label><select id="pdBim">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
+    <button class="btn ghost" id="pdfPend">Descargar PDF</button>
+  </div>
+  <div class="card">
+    <h3 style="margin:0 0 4px">Pendientes de entrega: cuadernos y libros</h3>
+    <div class="sub" style="margin-bottom:8px">Colegio Los Ángeles de Jesús · ${ORD[bim]} bimestre · ${g}° de Secundaria</div>
+    <div class="sub" style="margin-bottom:14px">Se consideran pendientes las notas de Cuaderno o Libro (N1 y N2) que están vacías. Entre paréntesis se indica qué nota falta. Un alumno sin ninguna nota registrada aparece como «Sin registro».</div>
+    <div style="margin-bottom:10px"><b>${g}° de Secundaria</b><br><span class="sub">${filas.length} de ${total} alumnos con pendientes · ${alDia} al día</span></div>
+    ${tabla}
+  </div>`;
+}
+function descargarPendientesPdf(g,bim){
+  if(!window.jspdf){alert('No se pudo cargar el generador de PDF. Revisa tu conexión e inténtalo de nuevo.');return;}
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const NAVY=[27,42,65],RED=[180,68,61];
+  const {filas,total,alDia}=datosPendientes(g,bim);
+  doc.setFont('helvetica','bold');doc.setFontSize(15);doc.setTextColor(...NAVY);
+  doc.text('Pendientes de entrega: cuadernos y libros',14,16);
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(90,90,90);
+  doc.text(`Colegio Los Ángeles de Jesús · ${ORD[bim]} bimestre · ${g}° de Secundaria`,14,22);
+  const nota=doc.splitTextToSize('Se consideran pendientes las notas de Cuaderno o Libro (N1 y N2) que están vacías. Entre paréntesis se indica qué nota falta. Un alumno sin ninguna nota registrada aparece como «Sin registro».',182);
+  doc.setFontSize(8.5);doc.text(nota,14,28);
+  const y0=28+nota.length*4+4;
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...NAVY);
+  doc.text(`${g}° de Secundaria`,14,y0);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(90,90,90);
+  doc.text(`${filas.length} de ${total} alumnos con pendientes · ${alDia} al día`,14,y0+5);
+  const body=filas.map(x=>[x.s.nombre,x.sinRegistro?'Sin registro':(x.cu.length?x.cu.join('\n'):'-'),x.sinRegistro?'Sin registro':(x.li.length?x.li.join('\n'):'-')]);
+  if(!body.length)body.push(['Todos los alumnos están al día','','']);
+  doc.autoTable({startY:y0+9,head:[['Alumno','Cuadernos que faltan','Libros que faltan']],body,theme:'grid',
+    headStyles:{fillColor:NAVY,fontSize:8.5},
+    styles:{fontSize:8,cellPadding:1.8,lineColor:[216,210,194],textColor:[32,35,43],valign:'top'},
+    alternateRowStyles:{fillColor:[236,231,218]},margin:{left:14,right:14},
+    columnStyles:{0:{cellWidth:38,fontStyle:'bold'}},
+    didParseCell:d=>{if(d.section==='body'&&d.cell.raw==='Sin registro'){d.cell.styles.textColor=RED;d.cell.styles.fontStyle='italic';}}});
+  doc.save(`Pendientes_${g}_Secundaria_${bim}_Bimestre.pdf`);
 }
 
 function viewAnalisis(){
@@ -363,6 +492,13 @@ function viewReportes(){
     ${list.length?`<table><thead><tr><th>N°</th><th>Alumno</th>${CURSOS.map(c=>`<th>${esc(c)}</th>`).join('')}<th>Prom. Gen.</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">Sin alumnos en ese grado.</div>'}`;
   }
   return `<h2>Reportes</h2><div class="sub no-print">Genera el registro por curso o el consolidado por grado, listos para imprimir o exportar a PDF.</div>
+  <div class="card no-print"><b style="font-family:Georgia,serif">Reporte completo en PDF</b>
+    <div class="sub" style="margin:6px 0 12px">Descarga en un solo archivo el consolidado de todos los grados y los registros de todos los cursos.</div>
+    <div class="row" style="margin-bottom:0">
+      <div><label>Bimestre</label><select id="repFullB">${BIMS.map(b=>`<option value="${b}" ${b==(window._repFB||3)?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
+      <button class="btn" id="fullPdfBtn">Descargar consolidado y registros (PDF)</button>
+    </div>
+  </div>
   <div class="tabbar no-print">
     <button data-rm="curso" class="${modo==='curso'?'active':''}">Por curso</button>
     <button data-rm="grado" class="${modo==='grado'?'active':''}">Consolidado por grado</button>
@@ -388,6 +524,20 @@ function wire(){
   [rGrado,rCurso,rBim].forEach(el=>{if(!el)return;el.onchange=()=>{
     window._rg=Number(rGrado.value); window._rc=rCurso.value; window._rb=Number(rBim.value); render();
   };});
+  m.querySelectorAll('.nota-in').forEach(inp=>inp.addEventListener('input',()=>{
+    const sid=inp.dataset.sid;
+    const fila=[...m.querySelectorAll('.nota-in')].filter(x=>x.dataset.sid===sid);
+    const llenos=fila.filter(x=>x.value!=='').length;
+    const p=Math.round(llenos/fila.length*100);
+    const c=document.getElementById('pct-'+sid);
+    if(c){c.textContent=p+'%';c.style.color=pctColor(p);}
+    const rs=document.getElementById('resumenLleno');
+    if(rs){
+      const sids=[...new Set([...m.querySelectorAll('.nota-in')].map(x=>x.dataset.sid))];
+      const ok=sids.filter(s=>[...m.querySelectorAll('.nota-in')].filter(x=>x.dataset.sid===s).every(x=>x.value!=='')).length;
+      rs.textContent=`${ok} de ${sids.length} alumnos con todas sus notas completas.`;
+    }
+  }));
   const sg=document.getElementById('saveGrades');
   if(sg)sg.onclick=async()=>{
     const g=window._rg||grados()[0], curso=window._rc||CURSOS[0], bim=window._rb||3;
@@ -412,6 +562,41 @@ function wire(){
   [repGG,repGB].forEach(el=>{if(!el)return;el.onchange=()=>{window._repGG=Number(repGG.value);window._repGB=Number(repGB.value);render();};});
   const pb=document.getElementById('printBtn');if(pb)pb.onclick=()=>window.print();
   const pb2=document.getElementById('printBtn2');if(pb2)pb2.onclick=()=>window.print();
+  m.querySelectorAll('[data-rmode]').forEach(b=>b.onclick=()=>{
+    if(window._dirtyAl&&!confirm('Tienes notas sin guardar. ¿Cambiar de vista y descartarlas?'))return;
+    window._dirtyAl=false;window._regMode=b.dataset.rmode;render();
+  });
+  const raG=document.getElementById('raGrado'),raS=document.getElementById('raSid'),raB=document.getElementById('raBim');
+  [raG,raS,raB].forEach(el=>{if(!el)return;el.onchange=()=>{
+    if(window._dirtyAl&&!confirm('Tienes notas sin guardar. ¿Cambiar y descartarlas?')){render();return;}
+    window._dirtyAl=false;
+    window._ra_sid=(el===raG)?null:raS.value;
+    window._ra_g=Number(raG.value);window._ra_b=Number(raB.value);render();
+  };});
+  const inAl=m.querySelectorAll('.nota-al');
+  inAl.forEach(inp=>inp.addEventListener('input',()=>{
+    window._dirtyAl=true;
+    const c=inp.dataset.curso;
+    const fila=[...inAl].filter(x=>x.dataset.curso===c);
+    const p=Math.round(fila.filter(x=>x.value!=='').length/fila.length*100);
+    const cell=document.getElementById('pa-'+CURSOS.indexOf(c));
+    if(cell){cell.textContent=p+'%';cell.style.color=pctColor(p);}
+  }));
+  const sa=document.getElementById('saveAlumno');
+  if(sa)sa.onclick=async()=>{
+    const sid=window._ra_sid,bim=window._ra_b||3;
+    sa.textContent='Guardando...';sa.disabled=true;
+    inAl.forEach(inp=>setField(sid,inp.dataset.curso,bim,inp.dataset.field,inp.value));
+    for(const c of CURSOS){await upsertGradeRow(sid,c,bim);}
+    window._dirtyAl=false;
+    sa.textContent='Guardado ✓';setTimeout(()=>render(),500);
+  };
+  const pdG=document.getElementById('pdGrado'),pdB=document.getElementById('pdBim');
+  [pdG,pdB].forEach(el=>{if(!el)return;el.onchange=()=>{window._pg=Number(pdG.value);window._pb=Number(pdB.value);render();};});
+  const pdfP=document.getElementById('pdfPend');
+  if(pdfP)pdfP.onclick=()=>descargarPendientesPdf(window._pg||grados()[0],window._pb||3);
+  const fB=document.getElementById('repFullB');if(fB)fB.onchange=()=>{window._repFB=Number(fB.value);};
+  const fBtn=document.getElementById('fullPdfBtn');if(fBtn)fBtn.onclick=()=>descargarReporteCompleto(Number(document.getElementById('repFullB').value));
   const exBtn=document.getElementById('exportXlsx');if(exBtn)exBtn.onclick=exportExcel;
   const imIn=document.getElementById('importXlsx');if(imIn)imIn.onchange=e=>importExcel(e.target.files[0]);
 }
@@ -476,6 +661,70 @@ async function importExcel(file){
     window._importMsg='No se pudo leer ese archivo. Verifica que tenga una hoja "Notas" con las columnas Bimestre, Grado, Curso, Alumno y las notas.';
     render();
   }
+}
+
+function descargarReporteCompleto(bim){
+  if(!window.jspdf){alert('No se pudo cargar el generador de PDF. Revisa tu conexión e inténtalo de nuevo.');return;}
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  const NAVY=[27,42,65],GREEN=[47,107,74],RED=[180,68,61];
+  const fmt=v=>(v===null||v===undefined)?'-':String(Math.round(v*100)/100);
+  const titulo=(t,s)=>{
+    doc.setFont('helvetica','bold');doc.setFontSize(15);doc.setTextColor(...NAVY);doc.text(t,148.5,15,{align:'center'});
+    doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(90,90,90);doc.text(s,148.5,21,{align:'center'});
+  };
+  const base={theme:'grid',headStyles:{fillColor:NAVY,halign:'center',fontSize:8},styles:{fontSize:8.5,cellPadding:1.8,lineColor:[216,210,194],textColor:[32,35,43]},alternateRowStyles:{fillColor:[236,231,218]},margin:{left:14,right:14}};
+  const gs=grados();
+  let first=true;
+
+  // Parte 1: consolidado por grado
+  gs.forEach(g=>{
+    const list=studentsOf(g); if(!list.length)return;
+    if(!first)doc.addPage(); first=false;
+    titulo(`CONSOLIDADO DE NOTAS - ${g}° DE SECUNDARIA`,`${BIM_LABEL[bim]} Bimestre · Colegio Los Ángeles de Jesús`);
+    const body=list.map((s,i)=>[i+1,s.nombre,...CURSOS.map(c=>fmt(promAlumnoCurso(s.id,c,bim))),fmt(promAlumnoGeneral(s.id,bim))]);
+    doc.autoTable({...base,startY:26,head:[['N°','Alumno',...CURSOS.map(c=>c.toUpperCase()),'PROM. GEN.']],body,
+      columnStyles:{0:{halign:'center',cellWidth:10},1:{cellWidth:58}},
+      didParseCell:d=>{
+        if(d.section==='body'&&d.column.index>=2){
+          d.cell.styles.halign='center';
+          if(d.column.index===CURSOS.length+2){const v=parseFloat(d.cell.raw);if(!isNaN(v)){d.cell.styles.textColor=v>=APROB?GREEN:RED;d.cell.styles.fontStyle='bold';}}
+        }
+      }});
+  });
+
+  // Parte 2: registros por grado y curso
+  gs.forEach(g=>{
+    const list=studentsOf(g); if(!list.length)return;
+    doc.addPage();
+    titulo(`REGISTRO AUXILIAR - ${g}° DE SECUNDARIA`,`${BIM_LABEL[bim]} Bimestre · Colegio Los Ángeles de Jesús · Nota mínima aprobatoria: ${APROB}`);
+    let y=28;
+    CURSOS.forEach(c=>{
+      if(y>165){doc.addPage();y=15;}
+      doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...NAVY);doc.text(c.toUpperCase(),14,y);
+      const body=list.map((s,i)=>{
+        const r=getRec(s.id,c,bim);
+        const prom=computeProm(r);
+        const estado=prom===null?'-':(prom>=APROB?'Aprobado':'Desaprobado');
+        return [i+1,s.nombre,fmt(r?avg2(r.cN1,r.cN2):null),fmt(r?avg2(r.lN1,r.lN2):null),fmt(r?avg2(r.conN1,r.conN2):null),fmt(r?r.exM:null),fmt(r?r.exB:null),fmt(prom),estado];
+      });
+      doc.autoTable({...base,startY:y+2,head:[['N°','Alumno','Cuaderno','Libro','Conducta','Ex. Mensual','Ex. Bimestral','Promedio','Estado']],body,
+        styles:{...base.styles,fontSize:8,cellPadding:1.4},
+        columnStyles:{0:{halign:'center',cellWidth:10},1:{cellWidth:62}},
+        didParseCell:d=>{
+          if(d.section==='body'&&d.column.index>=2){
+            d.cell.styles.halign='center';
+            if(d.column.index===8){
+              if(d.cell.raw==='Aprobado')d.cell.styles.textColor=GREEN;
+              else if(d.cell.raw==='Desaprobado')d.cell.styles.textColor=RED;
+            }
+          }
+        }});
+      y=doc.lastAutoTable.finalY+9;
+    });
+  });
+
+  doc.save(`Reporte_Completo_${BIM_LABEL[bim]}_Bimestre.pdf`);
 }
 
 /* ---------- Arranque ---------- */
