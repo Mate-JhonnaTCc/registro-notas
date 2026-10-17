@@ -354,7 +354,7 @@ function renderPendiente(){
   <div class="lg-ft"><div class="lg-dt">•••</div><button class="pb on" id="pdBtn">Revisar de nuevo</button></div>
   <div class="lg-ex"><div style="margin-top:6px"><a href="#" id="pdOut">Cerrar sesión</a></div></div></div></div>`;
   document.getElementById('pdOut').onclick=async e=>{e.preventDefault();await sb.auth.signOut();session=null;renderLogin();};
-  document.getElementById('pdBtn').onclick=async()=>{if(await afterLogin()){tab='estudiantes';render();}};
+  document.getElementById('pdBtn').onclick=async()=>{if(await afterLogin()){tab=ISADMIN?'estudiantes':'registro';render();}};
 }
 async function loadProfiles(){
   const {data,error}=await sb.from('profiles').select('*');
@@ -401,7 +401,7 @@ function renderAreaPicker(err){
     const a=document.getElementById('pkArea').value;
     const r=await sb.from('profiles').insert({user_id:session.user.id,area:a,email:session.user.email,approved:false,is_admin:false});
     if(r.error){renderAreaPicker('No se pudo guardar: '+r.error.message);return;}
-    if(await afterLogin(a)){tab='estudiantes';render();}
+    if(await afterLogin(a)){tab=ISADMIN?'estudiantes':'registro';render();}
   };
 }
 function askConfirm(title,msg,ok,cb,danger){
@@ -486,7 +486,8 @@ async function loadAllData(){
   const {data:studs,error:e1} = await sb.from('students').select('*');
   const {data:grds,error:e2} = await sb.from('grades').select('*').eq('area',AREA.id);
   if(e1||e2){ alert('Error cargando datos: '+((e1||e2).message)); return; }
-  DATA.students = studs.map(s=>({id:s.id,nombre:s.nombre,grado:s.grado}));
+  DATA.students = studs.filter(s=>!s.oculto).map(s=>({id:s.id,nombre:s.nombre,grado:s.grado}));
+  DATA.hidden = studs.filter(s=>s.oculto).map(s=>({id:s.id,nombre:s.nombre,grado:s.grado}));
   DATA.records = {};
   grds.forEach(r=>{
     DATA.records[r.sid]=DATA.records[r.sid]||{};
@@ -507,11 +508,13 @@ async function insertStudent(nombre,grado){
   DATA.students.push({id,nombre,grado});
   return id;
 }
-async function deleteStudentRemote(id){
-  const {error}=await sb.from('students').delete().eq('id',id);
-  if(error){ alert('Error eliminando: '+error.message); return; }
-  DATA.students=DATA.students.filter(s=>s.id!==id);
-  delete DATA.records[id];
+async function hideStudentRemote(id,oculto){
+  const {error}=await sb.from('students').update({oculto}).eq('id',id);
+  if(error){ alert('No se pudo cambiar el alumno: '+error.message); return false; }
+  const from=oculto?DATA.students:(DATA.hidden||[]),to=oculto?(DATA.hidden=DATA.hidden||[]):DATA.students;
+  const i=from.findIndex(x=>x.id===id);
+  if(i>=0)to.push(from.splice(i,1)[0]);
+  return true;
 }
 function setField(sid,curso,bim,field,val){
   DATA.records[sid]=DATA.records[sid]||{};
@@ -546,14 +549,14 @@ function renderLogin(err,mode,info){
       if(password!==document.getElementById('loginPass2').value){renderLogin('Las contraseñas no coinciden.','registro');return;}
       const area=document.getElementById('loginArea').value;const {data,error}=await sb.auth.signUp({email,password,options:{data:{area}}});
       if(error){renderLogin(error.message,'registro');return;}
-      if(data.session){ session=data.session; if(await afterLogin(area)){tab='estudiantes';render();} return; }
+      if(data.session){ session=data.session; if(await afterLogin(area)){tab=ISADMIN?'estudiantes':'registro';render();} return; }
       renderLogin('','login','Cuenta creada. Revisa tu correo y confirma el enlace; luego ingresa aquí.');
       return;
     }
     const {data,error}=await sb.auth.signInWithPassword({email,password});
     if(error){ renderLogin(error.message); return; }
     session=data.session;
-    if(await afterLogin()){tab='estudiantes';render();}
+    if(await afterLogin()){tab=ISADMIN?'estudiantes':'registro';render();}
   };
 }
 
@@ -578,9 +581,9 @@ function renderShell(){
   <div class="app">
   <nav>
     <div class="brand">Los Ángeles<small>Registro de Notas${AREA.name?' · '+esc(AREA.name):''}</small></div>
-    <button class="menu-toggle no-print" id="menuBtn" aria-label="Abrir menú"><span>${({estudiantes:'Estudiantes',registro:'Registro de notas',analisis:'Análisis',reportes:'Reportes',admin:'Administración'})[tab]||'Menú'}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <button class="menu-toggle no-print" id="menuBtn" aria-label="Abrir menú"><span>${({estudiantes:(ISADMIN?'Estudiantes':'Respaldo'),registro:'Registro de notas',analisis:'Análisis',reportes:'Reportes',admin:'Administración'})[tab]||'Menú'}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     <div class="nav-links">
-      <button data-tab="estudiantes">Estudiantes</button>
+      <button data-tab="estudiantes">${ISADMIN?'Estudiantes':'Respaldo'}</button>
       <button data-tab="registro">Registro de notas</button>
       <button data-tab="analisis">Análisis</button>
       <button data-tab="reportes">Reportes</button>
@@ -608,26 +611,29 @@ function render(){
 }
 
 function viewEstudiantes(){
-  const rows=[...DATA.students].sort((a,b)=>a.grado-b.grado||a.nombre.localeCompare(b.nombre))
-    .map(s=>`<tr><td>${esc(s.nombre)}</td><td>${s.grado}°</td>
-    <td>${ISADMIN?`<button class="btn danger" data-del="${s.id}">Eliminar</button>`:''}</td></tr>`).join('');
-  return `<h2>Estudiantes</h2><div class="sub">${DATA.students.length} alumnos cargados (1° a 5° de secundaria) — datos en la nube (Supabase).</div>
-  <div class="card"><div class="row">
-    <div><label>Nombre completo</label><input id="nName" placeholder="Nombre y apellidos"></div>
-    <div><label>Grado</label><select id="nGrado">${[1,2,3,4,5].map(g=>`<option value="${g}">${g}°</option>`).join('')}</select></div>
-    <button class="btn" id="addStudent">Agregar alumno</button>
-  </div></div>
-  <div class="card">
+  const bk=`<div class="card">
     <b style="font-family:inherit">Respaldo en Excel</b>
-    <div class="sub" style="margin:6px 0 12px">Descarga tus alumnos y notas a un Excel, o sube un Excel con la misma estructura para actualizar la nube.</div>
+    <div class="sub" style="margin:6px 0 12px">${ISADMIN?'Descarga los alumnos y notas a un Excel, o sube un Excel con la misma estructura para actualizar la nube.':'Descarga tus notas de '+esc(AREA.name)+' a un Excel, o sube un Excel con la misma estructura para actualizar la nube. Solo se actualizan los alumnos que ya existen: si falta alguno, pídele al administrador que lo agregue.'}</div>
     <div class="row" style="margin-bottom:0">
       <button class="btn ghost" id="exportXlsx">Exportar a Excel</button>
       <div><label>Importar Excel (hoja "Notas")</label><input type="file" id="importXlsx" accept=".xlsx,.xls"></div>
       <button class="btn" id="updateDbBtn" disabled>Actualizar base de datos</button>
     </div>
     <div id="importMsg" class="sub" style="margin:8px 0 0">${window._importMsg||''}</div>
-  </div>
-  <table><thead><tr><th>Nombre</th><th>Grado</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+  </div>`;
+  if(!ISADMIN)return `<h2>Respaldo</h2><div class="sub">Copia de seguridad de tus notas de ${esc(AREA.name)}.</div>`+bk;
+  const ord=(a,b)=>a.grado-b.grado||a.nombre.localeCompare(b.nombre);
+  const rows=[...DATA.students].sort(ord).map(s=>`<tr><td>${esc(s.nombre)}</td><td>${s.grado}°</td><td><button class="btn danger" data-hide="${s.id}">Ocultar</button></td></tr>`).join('');
+  const hid=[...(DATA.hidden||[])].sort(ord);
+  return `<h2>Estudiantes</h2><div class="sub">${DATA.students.length} alumnos cargados (1° a 5° de secundaria) — datos en la nube (Supabase).</div>
+  <div class="card"><div class="row">
+    <div><label>Nombre completo</label><input id="nName" placeholder="Nombre y apellidos"></div>
+    <div><label>Grado</label><select id="nGrado">${[1,2,3,4,5].map(g=>`<option value="${g}">${g}°</option>`).join('')}</select></div>
+    <button class="btn" id="addStudent">Agregar alumno</button>
+  </div></div>
+  ${bk}
+  <table><thead><tr><th>Nombre</th><th>Grado</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+  ${hid.length?`<div class="card" style="margin-top:18px"><b>Alumnos ocultos (${hid.length})</b><div class="sub" style="margin:4px 0 8px">No aparecen en el Registro, Análisis ni Reportes, pero sus notas siguen guardadas.</div>${hid.map(s=>`<div class="cfg-row"><div style="flex:1 1 200px">${esc(s.nombre)} <span class="sub">· ${s.grado}°</span></div><button class="btn ghost" data-restore="${s.id}" style="min-height:34px;padding:4px 14px">Restaurar</button></div>`).join('')}</div>`:''}`;
 }
 
 function fieldInput(sid,curso,bim,field,val){
@@ -1025,10 +1031,11 @@ function wire(){
     await insertStudent(name,g);
     render();
   };
-  m.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{
-    if(!confirm('¿Eliminar este alumno y sus notas de TODAS las áreas? Esta acción no se puede deshacer.'))return;
-    await deleteStudentRemote(b.dataset.del); render();
+  m.querySelectorAll('[data-hide]').forEach(b=>b.onclick=()=>{
+    const st=DATA.students.find(x=>x.id===b.dataset.hide);
+    askConfirm('¿Ocultar alumno?',`<b>${esc(st.nombre)}</b> dejará de aparecer en el Registro, el Análisis y los Reportes. Sus notas <b>no se borran</b> y podrás restaurarlo cuando quieras.`,'Sí, ocultar',async()=>{if(await hideStudentRemote(st.id,true))render();});
   });
+  m.querySelectorAll('[data-restore]').forEach(b=>b.onclick=async()=>{if(await hideStudentRemote(b.dataset.restore,false))render();});
   const rGrado=document.getElementById('rGrado'), rCurso=document.getElementById('rCurso'), rBim=document.getElementById('rBim');
   [rGrado,rCurso,rBim].forEach(el=>{if(!el)return;el.onchange=()=>{
     window._rg=Number(rGrado.value); window._rc=rCurso.value; window._rb=Number(rBim.value); render();
@@ -1133,7 +1140,11 @@ function parseGradoNum(v){ const m=String(v).match(/\d+/); return m?Number(m[0])
 async function findOrCreateStudentRemote(nombre,grado){
   const nn=String(nombre).trim().toLowerCase();
   let s=DATA.students.find(x=>x.grado==grado && x.nombre.trim().toLowerCase()===nn);
-  if(!s){ const id=await insertStudent(String(nombre).trim(),grado); s=DATA.students.find(x=>x.id===id); }
+  if(!s){
+    if((DATA.hidden||[]).some(x=>x.grado==grado && x.nombre.trim().toLowerCase()===nn)){window._skipHidden=(window._skipHidden||0)+1;return null;}
+    if(!ISADMIN){window._skipNoStud=(window._skipNoStud||0)+1;return null;}
+    const id=await insertStudent(String(nombre).trim(),grado); s=DATA.students.find(x=>x.id===id);
+  }
   return s;
 }
 function showLoading(msg){
@@ -1151,6 +1162,7 @@ function hideLoading(){const o=document.getElementById('loadingOverlay');if(o)o.
 
 async function importExcel(file){
   if(!file)return;
+  window._skipHidden=0;window._skipNoStud=0;
   showLoading('Actualizando base de datos...');
   setLoading('Leyendo el archivo...',3);
   try{
@@ -1189,7 +1201,7 @@ async function importExcel(file){
     setLoading('Listo',100);
     hideLoading();
     window._importFile=null;
-    window._importMsg=`Importación completa: ${n} registros de notas actualizados en la nube.`;
+    window._importMsg=`Importación completa: ${n} registros de notas actualizados en la nube.`+(window._skipNoStud?` ${window._skipNoStud} filas omitidas porque el alumno no existe (pide al administrador que lo agregue).`:'')+(window._skipHidden?` ${window._skipHidden} filas omitidas porque el alumno está oculto.`:'');
     render();
   }catch(e){
     hideLoading();
@@ -1265,7 +1277,7 @@ function descargarReporteCompleto(bim){
 /* ---------- Arranque ---------- */
 (async function start(){
   const {data:{session:s}}=await sb.auth.getSession();
-  if(s){ session=s; if(await afterLogin()) render(); }
+  if(s){ session=s; if(await afterLogin()){tab=ISADMIN?'estudiantes':'registro';render();} }
   else { renderLogin(); }
 })();
 </script>
