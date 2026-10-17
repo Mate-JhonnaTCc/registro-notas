@@ -18,11 +18,11 @@ body{margin:0;font-family:Georgia,'Times New Roman',serif;background:var(--paper
 .app{display:flex;min-height:100vh}
 nav{background:var(--navy);color:#fff;width:200px;flex:0 0 200px;padding:24px 0;position:sticky;top:0;height:100vh}
 nav h1{font-size:1.0rem;padding:0 20px 18px;margin:0 0 10px;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.3}
-nav button{display:block;width:100%;text-align:left;background:none;border:none;color:#cdd6e0;padding:12px 20px;font-family:Georgia,serif;font-size:.95rem;cursor:pointer;border-left:3px solid transparent}
+nav button{display:block;width:100%;text-align:left;background:none;border:none;color:#cdd6e0;padding:12px 20px;font-family:inherit;font-size:.95rem;cursor:pointer;border-left:3px solid transparent}
 nav button.active{color:#fff;background:var(--navy-2);border-left-color:var(--amber)}
 nav button:hover{color:#fff}
 nav .signout{margin-top:auto;opacity:.7;font-size:.8rem}
-main{flex:1;padding:32px 40px;max-width:1080px}
+main{flex:1;min-width:0;padding:32px 40px;max-width:1080px}
 h2{font-size:1.5rem;margin:0 0 4px;font-weight:600}
 h3{font-size:1.1rem;margin:18px 0 6px;color:var(--navy)}
 .sub{color:#6b7280;font-family:'Segoe UI',Arial,sans-serif;font-size:.88rem;margin-bottom:22px}
@@ -37,13 +37,21 @@ table{width:100%;border-collapse:collapse;background:#fff;font-family:'Segoe UI'
 th,td{padding:8px 9px;border-bottom:1px solid var(--paper-2);text-align:left}
 th{background:var(--paper-2);font-weight:600;font-size:.74rem;color:#444}
 tr:hover td{background:#fbfaf6}
-.nota-in,.nota-al{width:56px}
+.nota-in{width:56px;text-align:center}
+.nota-in:focus{outline:2px solid var(--amber);outline-offset:-1px;background:#fffbee}
+.overlay{position:fixed;inset:0;background:rgba(27,42,65,.65);display:flex;align-items:center;justify-content:center;z-index:9999;font-family:'Segoe UI',Arial,sans-serif}
+.overlay .box{background:#fff;border-radius:8px;padding:28px 36px;text-align:center;min-width:280px;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.spinner{width:42px;height:42px;border:4px solid var(--paper-2);border-top-color:var(--navy);border-radius:50%;margin:0 auto 14px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.progress{height:8px;background:var(--paper-2);border-radius:4px;overflow:hidden;margin-top:12px}
+.progress i{display:block;height:100%;width:0;background:var(--amber);transition:width .2s}
+button.btn:disabled{opacity:.5;cursor:not-allowed}
 .aprob{color:var(--green);font-weight:600}
 .desaprob{color:var(--red);font-weight:600}
 .card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:18px 20px;margin-bottom:16px}
 .stat{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:18px}
 .stat div{background:#fff;border:1px solid var(--line);border-radius:6px;padding:14px 20px;min-width:140px;font-family:'Segoe UI',Arial,sans-serif}
-.stat b{display:block;font-size:1.6rem;font-family:Georgia,serif;color:var(--navy)}
+.stat b{display:block;font-size:1.6rem;font-family:inherit;color:var(--navy)}
 .stat span{font-size:.75rem;color:#777}
 .bar-row{display:flex;align-items:center;gap:10px;margin:6px 0;font-family:'Segoe UI',Arial,sans-serif;font-size:.82rem}
 .bar-label{width:190px;flex:0 0 190px}
@@ -57,18 +65,190 @@ tr:hover td{background:#fbfaf6}
 .rpt-head h3{margin:0 0 2px;font-size:1.3rem}
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--navy)}
 .login-card{background:#fff;border-radius:8px;padding:36px 40px;width:320px;font-family:'Segoe UI',Arial,sans-serif}
-.login-card h2{font-family:Georgia,serif;color:var(--navy);margin-top:0}
+.login-card h2{font-family:inherit;color:var(--navy);margin-top:0}
 .login-card input{width:100%;margin-bottom:12px}
 .login-err{color:var(--red);font-size:.82rem;margin-top:8px;min-height:1em}
+.stk th:first-child,.stk td:first-child{position:sticky;left:0;background:#fff;z-index:1;box-shadow:1px 0 0 var(--line)}.stk th:first-child{background:var(--paper-2)}
+.c{position:relative;display:inline-block;vertical-align:top}
+.c input.nota-in{padding:6px 15px 6px 4px;touch-action:manipulation}
+.c .lki{position:absolute;right:4px;top:11px;width:11px;height:11px;display:none;color:#8a8a8a;pointer-events:none}
+.c.lk .lki{display:block}
+.c.lk input{background:var(--paper-2);color:#666;cursor:pointer}
+.c.md input{background:#fff4d6;border-color:#D9A441;color:#8a6212;font-weight:700}
+.c .pv{font-size:.68rem;color:#8a6212;height:14px;line-height:14px;white-space:nowrap}
+.chgbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px}
+#chgCnt{padding:5px 12px;border-radius:6px;background:#eee;font:.85rem 'Segoe UI',Arial,sans-serif;color:#555}
+#chgCnt.on{background:#fff4d6;color:#8a6212;font-weight:600}
+.bar-track{position:relative}
+.bar-track .thr{position:absolute;left:65%;top:0;bottom:0;border-left:2px dashed #555;opacity:.6}
+.bar-row[data-gc]:hover,.bar-row[data-gg]:hover{background:#eef1ff}
+.heat{table-layout:fixed}.heat th{font-size:.7rem;text-align:center}.heat td{color:#fff;text-align:center;cursor:pointer;font-weight:600;border:2px solid #fff}.heat td:hover{filter:brightness(1.12)}
+.pill{display:inline-block;padding:2px 9px;border-radius:10px;font-size:.74rem;font-weight:600;background:#eee;color:#555}
+.pill.bad{background:#f6dcda;color:#B4443D}.pill.mid{background:#fbecc9;color:#8a6212}.pill.ok{background:#d7ebde;color:#2f6b4a}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.lg{font-family:'Segoe UI',Arial,sans-serif;font-size:.78rem;border:1px solid var(--line);background:#fff;border-radius:12px;padding:3px 10px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.lg i{width:10px;height:10px;border-radius:50%;display:inline-block}.lg.off{opacity:.4;text-decoration:line-through}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+circle[data-tip]{cursor:pointer}
 @page{size:A4 landscape;margin:0}
 @media print{ nav,.no-print{display:none!important} main{padding:12mm;max-width:none} .app{display:block} }
 @media (max-width:760px){
   .app{flex-direction:column}
-  nav{width:100%;height:auto;position:static;display:flex;overflow-x:auto;padding:10px 0}
+  nav{width:100%;height:auto;flex:0 0 auto;position:sticky;top:0;z-index:50;display:flex;overflow-x:auto;padding:0;-webkit-overflow-scrolling:touch}
   nav h1{display:none} nav button{white-space:nowrap;border-left:none;border-bottom:3px solid transparent}
   nav button.active{border-bottom-color:var(--amber)}
-  main{padding:20px}
+  nav button{width:auto;flex:0 0 auto;padding:14px 16px;font-size:.9rem}
+  nav .signout{margin-top:0!important;padding:14px 16px!important}
+  main{padding:14px 12px 84px}
+  h2{font-size:1.25rem} .sub{margin-bottom:14px}
+  .card{padding:14px 12px;overflow:hidden}
+  /* filtros y formularios */
+  .row{gap:10px}
+  .row>div{flex:1 1 44%;min-width:120px}
+  .row select,.row input:not([type=file]){width:100%}
+  .row input[type=file]{width:100%;max-width:100%;font-size:.8rem}
+  .row>button.btn{flex:1 1 100%}
+  select,input,button.btn{min-height:42px;font-size:16px}
+  button.btn.danger{min-height:36px;font-size:.8rem;padding:6px 12px}
+  .nota-in{width:58px;padding:6px 4px}
+  /* tarjetas de indicadores en 2 columnas */
+  .stat{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .stat div{min-width:0;padding:12px}
+  .stat b{font-size:1.35rem}
+  /* pestañas con desplazamiento lateral */
+  .tabbar{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;margin-right:-12px;padding-right:12px}
+  .tabbar button{flex:0 0 auto;white-space:nowrap;padding:9px 14px}
+  /* tablas: se desplazan dentro de su caja */
+  main>table,.card>table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{font-size:.8rem} th,td{padding:8px 7px}
+  .heat{min-width:520px}
+  /* barras: nombre arriba, barra y valor debajo */
+  .bar-row{flex-wrap:wrap;gap:4px 10px;margin:12px 0}
+  .bar-label{width:100%;flex:0 0 100%;font-weight:600}
+  .bar-row b{width:auto!important;min-width:90px}
+  .login-card{width:100%;max-width:340px;margin:16px;padding:28px 22px}
+  .overlay .box{min-width:0;width:86vw}
+  /* botón guardar siempre a mano */
+  #saveGrades,#saveAlumno{position:fixed;bottom:14px;left:14px;right:14px;width:auto;z-index:40;min-height:48px;box-shadow:0 4px 14px rgba(0,0,0,.35)}
 }
+@media print{#saveGrades,#saveAlumno{display:none}}
+
+/* ====== TEMA CELESTE: tarjeta blanca, acento índigo y logo de fondo ====== */
+:root{--sky:#7BB8E8;--ind:#5B5BF0;--ind-2:#4a4ad8;--tx:#17161b;--mu:#8a8f99;--hl:#e6e6ea}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--sky);color:var(--tx);min-height:100vh}
+#root{position:relative;z-index:1}
+.app{display:block;min-height:100vh}
+nav{background:none;width:100%;flex:none;height:auto;position:static;padding:16px 28px 0;display:flex;flex-wrap:wrap;align-items:center;gap:6px;max-width:1160px;margin:0 auto;overflow:visible}
+nav .brand{font-weight:500;font-size:1.3rem;color:#fff;letter-spacing:-.5px;margin-right:16px;line-height:1.1}
+nav .brand small{display:block;font-size:.68rem;font-weight:400;opacity:.9;letter-spacing:0}
+nav button{display:inline-block;width:auto;border:none;background:none;color:#fff;font-family:inherit;font-size:.92rem;padding:8px 16px;border-radius:99px;cursor:pointer;transition:background .15s}
+nav button:hover{background:rgba(255,255,255,.22)}
+nav button.active{background:#fff;color:var(--tx)}
+nav .signout{margin:0 0 0 auto!important;opacity:1;font-size:.85rem;padding:8px 16px!important}
+main{background:#fff;border-radius:18px;padding:30px 34px;margin:16px auto 32px;max-width:1160px;width:calc(100% - 56px);box-shadow:0 12px 32px rgba(20,60,110,.18)}
+h2{font-family:inherit;font-weight:500;font-size:1.6rem;letter-spacing:-.3px}
+h3{color:var(--tx);font-weight:500}
+.sub,.login-card .sub{color:var(--mu)}
+label{color:var(--mu)}
+select,input{border:1px solid var(--hl);border-radius:10px;padding:9px 12px;background:#fff}
+select:focus,input:focus{outline:2px solid rgba(91,91,240,.35);border-color:var(--ind)}
+button.btn{background:var(--ind);border-radius:99px;padding:10px 22px;font-size:.9rem;transition:background .15s}
+button.btn:hover{background:var(--ind-2)}
+button.btn.ghost{background:none;color:var(--ind);border:1px solid var(--ind)}
+button.btn.ghost:hover{background:#f1f1ff}
+button.btn.danger{border-radius:99px;padding:5px 12px}
+.tabbar button{border:none;background:#f1f1f6;color:#555;border-radius:99px;padding:8px 16px;font-size:.85rem;transition:background .15s}
+.tabbar button:hover{background:#e6e6f8}
+.tabbar button.active{background:var(--ind);color:#fff}
+table{background:none;font-family:inherit}
+th{background:none;color:var(--mu);font-weight:400;font-size:.74rem;border-bottom:1px solid var(--hl)}
+td{border-bottom:1px solid var(--hl)}
+tr:hover td{background:#f7f8ff}
+.nota-in{border:1px solid #e1e3ea;border-radius:8px;background:#fff}
+.nota-in:focus{outline:2px solid var(--ind);outline-offset:-1px;background:#fff}
+.c.lk input{background:#f1f1f6;color:#666}
+.c.md input{background:#fff4d6;border-color:#D9A441;color:#8a6212;font-weight:700}
+.card{background:#fafbff;border:1px solid var(--hl);border-radius:14px}
+.stat div{background:#f6f7fd;border:none;border-radius:14px}
+.stat b{font-family:inherit;font-weight:500;color:var(--ind)}
+.bar-track{background:#eef0f6;border-radius:99px;height:12px}
+.bar-fill{border-radius:99px}
+.overlay .box{border-radius:16px}.spinner{border-top-color:var(--ind)}.progress i{background:var(--ind)}.progress{border-radius:99px}
+#saveGrades,#saveAlumno{border-radius:99px}
+/* inicio de sesión */
+.login-wrap{background:none;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative}
+.login-wm{position:absolute;top:22px;left:28px;font-weight:500;font-size:1.5rem;color:#fff;letter-spacing:-.5px}
+.login-card{background:#fff;border-radius:16px;padding:0;width:340px;max-width:100%;box-shadow:0 12px 32px rgba(20,60,110,.18)}
+.lg-hd{display:flex;align-items:center;gap:12px;padding:22px 22px 18px}
+.lg-ci{width:42px;height:42px;border-radius:50%;background:var(--ind);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.95rem;font-weight:500;flex:none}
+.lg-tt{font-size:1.25rem;line-height:1.2}
+.lg-ul{font-size:.78rem;border-bottom:1px solid var(--tx);display:inline-block}
+.lg-fl{border-top:1px solid var(--hl);padding:9px 22px 7px}
+.lg-fl label{font-size:.7rem;margin:0}
+.lg-fl input{border:none;outline:none!important;background:transparent;width:100%;height:28px;padding:0;margin:0;font-size:1rem;border-radius:0}
+.lg-ft{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--hl);padding:14px 22px}
+.lg-dt{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ind);color:var(--ind);display:flex;align-items:center;justify-content:center;font-size:.7rem}
+.pb{border:none;border-radius:99px;padding:0 34px;height:44px;font-size:1rem;color:#fff;background:#b9bcc4;cursor:pointer;transition:background .15s}
+.pb.on{background:var(--ind)}.pb.on:hover{background:var(--ind-2)}
+.lg-ex{padding:0 22px 18px;font-size:.85rem}
+.lg-ex a{color:var(--ind)}
+@media(max-width:760px){
+ nav{padding:12px 12px 0;flex-wrap:nowrap;overflow-x:auto;gap:4px}
+ nav .brand{flex:0 0 auto}
+ nav button{flex:0 0 auto;white-space:nowrap;padding:8px 14px;font-size:.88rem}
+ nav .signout{margin-left:6px!important}
+ main{padding:18px 14px 90px;margin:12px 10px 20px;width:auto;border-radius:16px}
+ .login-wm{top:16px;left:18px}
+}
+@media print{body{background:#fff}body::before{display:none}main{box-shadow:none;border-radius:0;margin:0;width:auto;max-width:none}}
+
+/* ajustes de color y formulario de archivo */
+:root{--green:#3a47c4;--red:#d6455a;--amber:#F4B860}
+.aprob{color:#3a47c4}.desaprob{color:#d6455a}
+.pill.ok{background:#e0e6ff;color:#3a47c4}.pill.bad{background:#fde0e3;color:#c23b50}.pill.mid{background:#fdeccd;color:#8a5a12}
+.bar-row[data-gc]:hover,.bar-row[data-gg]:hover{background:#eef1ff}
+.stk th:first-child{background:#fff}
+.stk td:first-child{background:#fff}
+input[type=file]{padding:6px 14px 6px 6px;border-radius:99px;background:#fff;color:var(--mu);font-size:.85rem;cursor:pointer;max-width:100%}
+input[type=file]::file-selector-button{background:#eef0ff;color:var(--ind);border:1px solid rgba(91,91,240,.35);border-radius:99px;padding:7px 18px;margin-right:12px;font:inherit;font-size:.85rem;cursor:pointer;transition:background .15s}
+input[type=file]::file-selector-button:hover{background:#e0e2ff}
+
+/* menú móvil desplegable, pestañas en cuadrícula y confirmación de salida */
+.menu-toggle{display:none}.nav-links{display:contents}
+.lo-btns{display:flex;gap:10px;margin-top:20px}.lo-btns .btn{flex:1}
+button.btn.warn{background:#d6455a}button.btn.warn:hover{background:#c23b50}
+@media(max-width:760px){
+ nav{flex-wrap:wrap;overflow:visible;position:relative;padding:12px 12px 0;gap:0;align-items:center;justify-content:space-between}
+ nav .brand{flex:0 0 auto;margin:0}
+ .menu-toggle{display:inline-flex;align-items:center;gap:8px;background:#fff!important;color:var(--tx)!important;border-radius:99px;padding:9px 14px!important;font-size:.88rem;max-width:62%}
+ .menu-toggle span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .menu-toggle svg{flex:none;width:18px;height:18px}
+ .nav-links{display:none;flex-direction:column;width:100%;background:#fff;border-radius:16px;padding:8px;margin-top:10px;box-shadow:0 12px 32px rgba(20,60,110,.25)}
+ nav.open .nav-links{display:flex}
+ .nav-links button{display:block;width:100%;text-align:left;padding:14px 16px;border-radius:12px;color:var(--tx);font-size:1rem;background:none}
+ .nav-links button:hover{background:#f1f1f6}
+ .nav-links button.active{background:#eef0ff;color:var(--ind);font-weight:500}
+ .nav-links .signout{margin:6px 0 0!important;border-top:1px solid var(--hl);border-radius:0 0 12px 12px;color:#d6455a;padding:14px 16px!important}
+ .tabbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px;overflow:visible;margin-right:0;padding-right:0}
+ .tabbar button{white-space:normal;text-align:center;line-height:1.2;padding:10px 6px;font-size:.8rem;border-radius:14px}
+}
+
+/* áreas y configuración */
+.areabar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px}
+.chip{display:inline-block;background:var(--ind);color:#fff;font-size:.82rem;padding:5px 14px;border-radius:99px}
+.pesoh{font-size:.68rem;color:#8a8f99;font-weight:400}
+.lg-fl select{border:none;outline:none;background:transparent;width:100%;height:30px;padding:0;margin:0;font-size:1rem;color:#17161b;border-radius:0}
+.overlay .cfgbox{text-align:left;max-width:640px;width:94vw;max-height:88vh;overflow:auto;padding:22px}
+.cfg-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--hl);padding:8px 0}
+.cfg-row .cn{flex:1 1 170px;min-width:0}
+.cfg-row .pw{display:flex;align-items:center;gap:6px;font-size:.85rem;color:#555}
+.cfg-row .pw input{width:70px;text-align:center}
+.cfg-row .en{display:flex;align-items:center;gap:6px;font-size:.82rem;color:#555}
+.cfg-row .en input{width:auto;min-height:0}
+.cfg-row .rm{border:none;background:none;color:#d6455a;cursor:pointer;font-size:.85rem}
+.cfg-tot{margin:6px 0 10px;font-size:.88rem;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip-sel{background:var(--ind);color:#fff;border:none;border-radius:99px;padding:6px 14px;font-size:.85rem}
+.chip-sel option{color:#17161b;background:#fff}
 </style>
 </head>
 <body>
@@ -81,10 +261,10 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const CURSOS=['Aritmética','Geometría','Trigonometría','Razonamiento Matemático','Álgebra'];
+let CURSOS=[];
 const BIMS=[1,2,3,4];
 const BIM_LABEL={1:'I',2:'II',3:'III',4:'IV'};
-const APROB=11;
+const APROB=13;
 const GRADO_LABEL={1:'1° de Secundaria',2:'2° de Secundaria',3:'3° de Secundaria',4:'4° de Secundaria',5:'5° de Secundaria'};
 
 let DATA={students:[],records:{}};
@@ -96,10 +276,10 @@ function uid(){return 's'+Math.random().toString(36).slice(2,9);}
 function avg2(a,b){const v=[a,b].filter(x=>x!==null&&x!==undefined);return v.length?v.reduce((x,y)=>x+y,0)/v.length:null;}
 function computeProm(r){
   if(!r)return null;
-  const cu=avg2(r.cN1,r.cN2), li=avg2(r.lN1,r.lN2), co=avg2(r.conN1,r.conN2);
-  const comps=[cu,li,co,r.exM??null,r.exB??null].filter(v=>v!==null&&v!==undefined);
-  if(!comps.length)return null;
-  return Math.ceil(comps.reduce((a,b)=>a+b,0)/comps.length);
+  const G=new Map();
+  acols().forEach(c=>{const k=c.g||c.id,g=G.get(k)||{w:0,s:0,n:0},w=Number(c.w)||0,v=r[c.id];g.w+=w;if(v!==null&&v!==undefined&&v!==''){g.s+=w*Number(v);g.n+=w;}G.set(k,g);});
+  let sw=0,ss=0;G.forEach(g=>{if(g.n>0){sw+=g.w;ss+=g.w*(g.s/g.n);}});
+  return sw>0?Math.ceil(Math.round(ss/sw*1e6)/1e6):null;
 }
 function getRec(sid,curso,bim){return (DATA.records[sid]&&DATA.records[sid][curso]&&DATA.records[sid][curso][bim])||null;}
 function promAlumnoCurso(sid,curso,bim){return computeProm(getRec(sid,curso,bim));}
@@ -107,7 +287,7 @@ function promAlumnoGeneral(sid,bim){
   const vals=CURSOS.map(c=>promAlumnoCurso(sid,c,bim)).filter(v=>v!==null);
   return vals.length? Math.round((vals.reduce((a,b)=>a+b,0)/vals.length)*100)/100 : null;
 }
-const CAMPOS=['cN1','cN2','lN1','lN2','conN1','conN2','exM','exB'];
+let CAMPOS=[];
 function pctLleno(r){
   if(!r)return 0;
   const n=CAMPOS.filter(c=>r[c]!==null&&r[c]!==undefined&&r[c]!=='').length;
@@ -118,25 +298,206 @@ function pctCell(sid,p){return `<td id="pct-${sid}" style="font-weight:600;color
 function grados(){return[...new Set(DATA.students.map(s=>s.grado))].sort((a,b)=>a-b);}
 function studentsOf(g){return DATA.students.filter(s=>s.grado==g).sort((a,b)=>a.nombre.localeCompare(b.nombre));}
 
+/* ---------- ÁREAS, CONFIGURACIÓN DE CURSOS Y COLUMNAS ---------- */
+const AREAS={matematica:'Matemática',comunicacion:'Comunicación',religion:'Religión',sociales:'Ciencias Sociales',ingles:'Inglés',ciencia:'Ciencia y Tecnología',psicologia:'Psicología'};
+const K=(id,name,w,o)=>({id,name,w,...(o||{})});
+const DEF={
+ matematica:{cursos:['Aritmética','Geometría','Trigonometría','Razonamiento Matemático','Álgebra'],cols:[
+  K('cN1','Cuad. N1',10,{x:'Cuaderno N1',sh:'N1',g:'Cuaderno',ent:'Cuadernos'}),K('cN2','Cuad. N2',10,{x:'Cuaderno N2',sh:'N2',g:'Cuaderno',ent:'Cuadernos'}),
+  K('lN1','Libro N1',10,{x:'Libro N1',sh:'N1',g:'Libro',ent:'Libros'}),K('lN2','Libro N2',10,{x:'Libro N2',sh:'N2',g:'Libro',ent:'Libros'}),
+  K('conN1','Cond. N1',10,{x:'Conducta N1',g:'Conducta'}),K('conN2','Cond. N2',10,{x:'Conducta N2',g:'Conducta'}),
+  K('exM','Ex.Mensual',20,{x:'Examen Mensual'}),K('exB','Ex.Bimestral',20,{x:'Examen Bimestral'})]},
+ comunicacion:{cursos:['Comprensión lectora','Gramática','Ortografía','Redacción','Plan lector'],cols:[K('p1','Práctica 1',20),K('p2','Práctica 2',20),K('par','Participación',10),K('exM','Ex. Mensual',25),K('exB','Ex. Bimestral',25)]},
+ religion:{cursos:['Religión'],cols:[K('cua','Cuaderno',25,{ent:'Cuadernos',sh:'Cuaderno'}),K('par','Participación',25),K('exM','Ex. Mensual',25),K('exB','Ex. Bimestral',25)]},
+ sociales:{cursos:['Historia','Geografía','Economía','Formación ciudadana'],cols:[K('tra','Trabajo',20),K('par','Participación',20),K('exM','Ex. Mensual',30),K('exB','Ex. Bimestral',30)]},
+ ingles:{cursos:['Inglés'],cols:[K('tar','Tarea',20),K('par','Participación',20),K('exM','Ex. Mensual',30),K('exB','Ex. Bimestral',30)]},
+ ciencia:{cursos:['Biología','Química','Física'],cols:[K('pra','Práctica',20),K('lab','Laboratorio',20),K('exM','Ex. Mensual',30),K('exB','Ex. Bimestral',30)]},
+ psicologia:{cursos:['Psicología'],cols:[K('par','Participación',30),K('tra','Trabajo',30),K('exB','Ex. Bimestral',40)]}
+};
+let AREA={id:'',name:'',cursos:[],cursosOff:[],cols:[]};
+function acols(){return AREA.cols.filter(c=>!c.off);}
+function applyConfig(cfg){
+  AREA.cursos=[...cfg.cursos];AREA.cursosOff=[...(cfg.cursosOff||[])];AREA.cols=cfg.cols.map(c=>({...c}));
+  CURSOS=AREA.cursos;CAMPOS=acols().map(c=>c.id);
+}
+function groups(){const m=new Map();acols().forEach(c=>{const k=c.g||c.id;if(!m.has(k))m.set(k,{k,label:c.g||c.name,cols:[]});m.get(k).cols.push(c);});return [...m.values()];}
+function gval(r,g){const v=g.cols.map(c=>r?r[c.id]:null).filter(x=>x!==null&&x!==undefined&&x!=='').map(Number);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length*100)/100:null;}
+function compsList(){return groups().map(g=>[g.k,g.label]);}
+function pendCats(){const m=new Map();acols().forEach(c=>{if(c.ent){if(!m.has(c.ent))m.set(c.ent,[]);m.get(c.ent).push(c);}});return [...m];}
+function pendHead(e){return /s$/i.test(e)?`${e} que faltan`:`Pendiente: ${e}`;}
+function pendTitulo(){const c=pendCats();return 'Pendientes de entrega'+(c.length?': '+c.map(x=>x[0].toLowerCase()).join(' y '):'');}
+function pendNota(){const c=pendCats();return (c.length?`Se consideran pendientes las notas de ${c.map(x=>x[0]).join(' o ')} que están vacías.`:'Marca columnas como «Entregable» en Configurar para ver aquí lo que falta entregar.')+' Un alumno sin ninguna nota registrada aparece como «Sin registro».';}
+
+/* Usuario sin correo real: 'mate.lopez' se convierte en mate.lopez@example.com */
+const DOMINIO_USUARIOS='example.com';
+function aCorreo(v){v=(v||'').trim();if(v.includes('@'))return v;return v.toLowerCase().replace(/\s+/g,'')+'@'+DOMINIO_USUARIOS;}
+function verU(e){return e&&e.endsWith('@'+DOMINIO_USUARIOS)?e.slice(0,-(DOMINIO_USUARIOS.length+1)):e;}
+let ISADMIN=false,PROFS=null;
+async function afterLogin(areaPref){
+  const uidu=session.user.id;
+  const {data:pf,error}=await sb.from('profiles').select('area,approved,is_admin').eq('user_id',uidu).maybeSingle();
+  if(error)alert('Falta preparar la base de datos: ejecuta migracion_areas.sql y luego migracion_admin.sql en Supabase. Detalle: '+error.message);
+  let area=pf&&pf.area,ok=!!(pf&&pf.approved);ISADMIN=!!(pf&&pf.is_admin);PROFS=null;
+  if(!pf){
+    const a=areaPref||(session.user.user_metadata||{}).area;
+    if(a&&AREAS[a]){const r=await sb.from('profiles').insert({user_id:uidu,area:a,email:session.user.email,approved:false,is_admin:false});if(!r.error){area=a;ok=false;}}
+  }
+  if(!area){renderAreaPicker();return false;}
+  AREA.id=area;AREA.name=AREAS[area];
+  if(!ok&&!ISADMIN){renderPendiente();return false;}
+  await setArea(area);return true;
+}
+function renderPendiente(){
+  document.getElementById('root').innerHTML=`<div class="login-wrap"><div class="login-wm">Los Ángeles</div><div class="login-card">
+  <div class="lg-hd"><div class="lg-ci">LA</div><div><div class="lg-tt">Cuenta pendiente</div><span class="lg-ul">Área: ${esc(AREA.name)}</span></div></div>
+  <div class="lg-fl" style="line-height:1.5;font-size:.92rem;color:#555">El administrador debe aprobar tu cuenta antes de que puedas registrar notas. Cuando lo haga, presiona «Revisar de nuevo».</div>
+  <div class="lg-ft"><div class="lg-dt">•••</div><button class="pb on" id="pdBtn">Revisar de nuevo</button></div>
+  <div class="lg-ex"><div style="margin-top:6px"><a href="#" id="pdOut">Cerrar sesión</a></div></div></div></div>`;
+  document.getElementById('pdOut').onclick=async e=>{e.preventDefault();await sb.auth.signOut();session=null;renderLogin();};
+  document.getElementById('pdBtn').onclick=async()=>{if(await afterLogin()){tab='estudiantes';render();}};
+}
+async function loadProfiles(){
+  const {data,error}=await sb.from('profiles').select('*');
+  if(error){alert('No se pudieron cargar las cuentas: '+error.message);PROFS=[];}else PROFS=data;
+  render();
+}
+function viewAdmin(){
+  if(PROFS===null){loadProfiles();return '<h2>Administración</h2><div class="empty">Cargando cuentas…</div>';}
+  const me=session.user.id,pend=PROFS.filter(p=>!p.approved),act=PROFS.filter(p=>p.approved).sort((a,b)=>(a.email||'').localeCompare(b.email||''));
+  const areaSel=p=>`<select data-ar="${p.user_id}">${Object.entries(AREAS).map(([k,v])=>`<option value="${k}" ${k===p.area?'selected':''}>${v}</option>`).join('')}</select>`;
+  return `<h2>Administración</h2><div class="sub">Aprueba cuentas nuevas, cambia el área de un profesor o quita accesos. Solo tú ves esta pestaña.</div>
+  <div class="card"><b>Cuentas pendientes de aprobación (${pend.length})</b>${pend.length?pend.map(p=>`<div class="cfg-row"><div style="flex:1 1 200px"><b>${esc(verU(p.email)||'(sin correo)')}</b><div class="sub" style="margin:0">Pide acceso a: ${esc(AREAS[p.area]||p.area)}</div></div><button class="btn" data-ap="${p.user_id}">Aprobar</button><button class="rm" data-rj="${p.user_id}">Rechazar</button></div>`).join(''):'<div class="sub" style="margin:8px 0 0">No hay cuentas pendientes.</div>'}</div>
+  <div class="card"><b>Profesores con acceso (${act.length})</b>${act.map(p=>`<div class="cfg-row"><div style="flex:1 1 200px"><b>${esc(verU(p.email)||'(sin correo)')}</b> ${p.is_admin?'<span class="pill ok">Administrador</span>':''}</div>${areaSel(p)}${p.user_id===me?'':`<button class="btn ghost" data-ad="${p.user_id}" style="min-height:34px;padding:4px 14px">${p.is_admin?'Quitar admin':'Hacer admin'}</button><button class="rm" data-rj="${p.user_id}">Quitar acceso</button>`}</div>`).join('')}</div>
+  <div class="sub">Los alumnos solo se pueden eliminar desde la pestaña Estudiantes, y solo con una cuenta de administrador.</div>`;
+}
+function wireAdmin(){
+  const m=document.getElementById('main');if(!m)return;
+  const find=id=>PROFS&&PROFS.find(p=>p.user_id===id);
+  const upd=async(id,patch)=>{const {error}=await sb.from('profiles').update(patch).eq('user_id',id);if(error){alert('No se pudo guardar: '+error.message);return;}await loadProfiles();};
+  m.querySelectorAll('[data-ap]').forEach(b=>b.onclick=()=>upd(b.dataset.ap,{approved:true}));
+  m.querySelectorAll('[data-rj]').forEach(b=>b.onclick=()=>{const p=find(b.dataset.rj);askConfirm(p.approved?'¿Quitar acceso?':'¿Rechazar la cuenta?',`${esc(verU(p.email)||'Esta cuenta')} ${p.approved?'ya no podrá entrar a registrar notas. Sus notas se conservan.':'no podrá registrar notas.'}`,'Sí, continuar',async()=>{const {error}=await sb.from('profiles').delete().eq('user_id',p.user_id);if(error)alert('No se pudo: '+error.message);else await loadProfiles();});});
+  m.querySelectorAll('[data-ar]').forEach(sel=>sel.onchange=()=>{const p=find(sel.dataset.ar),v=sel.value;sel.value=p.area;askConfirm('¿Cambiar de área?',`${esc(verU(p.email)||'Esta cuenta')} pasará a ${esc(AREAS[v])}.`,'Sí, cambiar',()=>upd(p.user_id,{area:v}),false);});
+  m.querySelectorAll('[data-ad]').forEach(b=>b.onclick=()=>{const p=find(b.dataset.ad);askConfirm(p.is_admin?'¿Quitar rol de administrador?':'¿Hacer administrador?',p.is_admin?`${esc(verU(p.email))} dejará de administrar cuentas.`:`${esc(verU(p.email))} podrá aprobar cuentas, ver todas las áreas y eliminar alumnos.`,'Sí, continuar',()=>upd(p.user_id,{is_admin:!p.is_admin}),false);});
+  const ar=document.getElementById('admArea');
+  if(ar)ar.onchange=async()=>{
+    if(modCount()>0){alert('Primero guarda las notas que modificaste.');ar.value=AREA.id;return;}
+    await setArea(ar.value);window._rc=window._ac=window._repC=window._ras=null;render();
+  };
+}
+async function setArea(id){
+  AREA.id=id;AREA.name=AREAS[id];
+  const {data}=await sb.from('area_config').select('config').eq('area',id).maybeSingle();
+  applyConfig((data&&data.config)||DEF[id]);
+  await loadAllData();
+}
+function renderAreaPicker(err){
+  document.getElementById('root').innerHTML=`<div class="login-wrap"><div class="login-wm">Los Ángeles</div><div class="login-card">
+  <div class="lg-hd"><div class="lg-ci">LA</div><div><div class="lg-tt">Elige tu área</div><span class="lg-ul">Solo se elige una vez</span></div></div>
+  <div class="lg-fl"><label>Tu área</label><select id="pkArea">${Object.entries(AREAS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></div>
+  <div class="lg-ft"><div class="lg-dt">•••</div><button class="pb on" id="pkBtn">Continuar</button></div>
+  <div class="lg-ex"><div class="login-err">${err||''}</div><div style="margin-top:6px"><a href="#" id="pkOut">Cerrar sesión</a></div></div></div></div>`;
+  document.getElementById('pkOut').onclick=async e=>{e.preventDefault();await sb.auth.signOut();session=null;renderLogin();};
+  document.getElementById('pkBtn').onclick=async()=>{
+    const a=document.getElementById('pkArea').value;
+    const r=await sb.from('profiles').insert({user_id:session.user.id,area:a,email:session.user.email,approved:false,is_admin:false});
+    if(r.error){renderAreaPicker('No se pudo guardar: '+r.error.message);return;}
+    if(await afterLogin(a)){tab='estudiantes';render();}
+  };
+}
+function askConfirm(title,msg,ok,cb,danger){
+  const o=document.createElement('div');o.className='overlay';
+  o.innerHTML=`<div class="box" role="dialog" aria-modal="true" style="max-width:390px;width:90vw"><h3 style="margin:0 0 8px;font-size:1.2rem">${title}</h3><div style="color:#667085;font-size:.92rem;line-height:1.5;text-align:left">${msg}</div><div class="lo-btns"><button class="btn ghost" data-n>Cancelar</button><button class="btn ${danger===false?'':'warn'}" data-y>${ok}</button></div></div>`;
+  document.body.appendChild(o);
+  o.querySelector('[data-n]').onclick=()=>o.remove();
+  o.querySelector('[data-y]').onclick=()=>{o.remove();cb();};
+  o.onclick=e=>{if(e.target===o)o.remove();};
+}
+function openConfig(){
+  const D={cu:AREA.cursos.map(n=>({n,o:n})),off:[...AREA.cursosOff],cols:AREA.cols.map(c=>({...c}))};
+  const ov=document.createElement('div');ov.className='overlay';ov.innerHTML='<div class="box cfgbox"></div>';
+  document.body.appendChild(ov);const B=ov.firstChild;
+  const tot=()=>D.cols.filter(c=>!c.off).reduce((a,c)=>a+(Number(c.w)||0),0);
+  const upT=()=>{const t=B.querySelector('#tt');if(t){t.textContent=tot()+'%';t.style.color=tot()===100?'#3a47c4':'#b7791f';}};
+  const rid=()=>'k'+Math.random().toString(36).slice(2,7);
+  function draw(){
+    const ac=D.cols.filter(c=>!c.off),hc=D.cols.filter(c=>c.off);
+    B.innerHTML=`<h3 style="margin:0 0 4px;font-size:1.25rem">Configurar · ${esc(AREA.name)}</h3><div class="sub" style="margin:0 0 14px">Elige qué vas a calificar y cuánto pesa cada columna en el promedio. Nada cambia hasta que guardes y confirmes.</div>
+    <b>Columnas de calificación</b>
+    ${ac.map(c=>`<div class="cfg-row"><input class="cn" data-c="${c.id}" value="${esc(c.name)}" placeholder="Nombre"><label class="pw">Peso <input type="number" min="0" max="100" data-w="${c.id}" value="${c.w}">%</label><label class="en"><input type="checkbox" data-e="${c.id}" ${c.ent?'checked':''}> Entregable</label><button class="rm" data-rc="${c.id}">Quitar</button></div>`).join('')}
+    <div class="cfg-tot">Los pesos suman <b id="tt"></b> <span class="sub">(el promedio se calcula proporcional a los pesos)</span> <button class="btn ghost" data-eq style="min-height:34px;padding:4px 14px">Repartir por igual</button></div>
+    <div class="cfg-row"><input class="cn" id="nc" placeholder="Nueva columna, ej. Exposición"><label class="pw">Peso <input type="number" id="nw" min="0" max="100" value="10">%</label><button class="btn ghost" data-ac style="min-height:36px">Agregar columna</button></div>
+    ${hc.length?`<div class="sub" style="margin-top:8px">Ocultas: ${hc.map(c=>`${esc(c.name)} <a href="#" data-rs="${c.id}">Restaurar</a>`).join(' · ')}</div>`:''}
+    <b style="display:block;margin-top:18px">Cursos del área</b>
+    ${D.cu.map((c,i)=>`<div class="cfg-row"><input class="cn" data-cu="${i}" value="${esc(c.n)}"><button class="rm" data-rcu="${i}">Quitar</button></div>`).join('')}
+    <div class="cfg-row"><input class="cn" id="ncu" placeholder="Nuevo curso"><button class="btn ghost" data-acu style="min-height:36px">Agregar curso</button></div>
+    ${D.off.length?`<div class="sub" style="margin-top:8px">Ocultos: ${D.off.map((n,i)=>`${esc(n)} <a href="#" data-rcs="${i}">Restaurar</a>`).join(' · ')}</div>`:''}
+    <div class="lo-btns" style="margin-top:20px"><button class="btn ghost" data-x>Cancelar</button><button class="btn" data-save>Guardar cambios</button></div>`;
+    upT();
+    const q=s=>B.querySelectorAll(s);
+    q('[data-c]').forEach(i=>i.oninput=()=>{const c=D.cols.find(x=>x.id===i.dataset.c);if(c.ent===c.name)c.ent=i.value;c.name=i.value;});
+    q('[data-w]').forEach(i=>i.oninput=()=>{D.cols.find(x=>x.id===i.dataset.w).w=Math.max(0,Math.min(100,Number(i.value)||0));upT();});
+    q('[data-e]').forEach(i=>i.onchange=()=>{const c=D.cols.find(x=>x.id===i.dataset.e);if(i.checked)c.ent=c.ent||c.name;else delete c.ent;});
+    q('[data-rc]').forEach(b=>b.onclick=()=>{const c=D.cols.find(x=>x.id===b.dataset.rc);if(ac.length<2){alert('Debe quedar al menos una columna.');return;}askConfirm('¿Quitar la columna?',`Vas a quitar «${esc(c.name)}». Las notas ya registradas en esa columna quedan ocultas, no se borran, y podrás restaurarlas.`,'Sí, quitar',()=>{c.off=true;draw();});});
+    q('[data-rs]').forEach(a=>a.onclick=e=>{e.preventDefault();D.cols.find(x=>x.id===a.dataset.rs).off=false;draw();});
+    q('[data-eq]')[0].onclick=()=>{const n=ac.length,b=Math.floor(100/n);ac.forEach((c,i)=>c.w=i===n-1?100-b*(n-1):b);draw();};
+    q('[data-ac]')[0].onclick=()=>{const n=B.querySelector('#nc').value.trim();if(!n)return;D.cols.push({id:rid(),name:n,w:Math.max(0,Math.min(100,Number(B.querySelector('#nw').value)||0))});draw();};
+    q('[data-cu]').forEach(i=>i.oninput=()=>{D.cu[i.dataset.cu].n=i.value;});
+    q('[data-rcu]').forEach(b=>b.onclick=()=>{const i=+b.dataset.rcu,c=D.cu[i];if(D.cu.length<2){alert('Debe quedar al menos un curso.');return;}askConfirm('¿Quitar el curso?',`Vas a quitar «${esc(c.n)}». Sus notas quedan guardadas y podrás restaurarlo.`,'Sí, quitar',()=>{D.cu.splice(i,1);D.off.push(c.o||c.n);draw();});});
+    q('[data-rcs]').forEach(a=>a.onclick=e=>{e.preventDefault();const n=D.off.splice(+a.dataset.rcs,1)[0];D.cu.push({n,o:n});draw();});
+    q('[data-acu]')[0].onclick=()=>{const n=B.querySelector('#ncu').value.trim();if(n){D.cu.push({n,o:null});draw();}};
+    q('[data-x]')[0].onclick=()=>ov.remove();
+    q('[data-save]')[0].onclick=guardar;
+  }
+  function guardar(){
+    const ac=D.cols.filter(c=>!c.off),names=ac.map(c=>c.name.trim().toLowerCase()),cn=D.cu.map(c=>c.n.trim().toLowerCase());
+    if(ac.some(c=>!c.name.trim())||names.length!==new Set(names).size){alert('Cada columna debe tener un nombre distinto y no vacío.');return;}
+    if(D.cu.some(c=>!c.n.trim())||cn.length!==new Set(cn).size){alert('Cada curso debe tener un nombre distinto y no vacío.');return;}
+    if(tot()<=0){alert('Los pesos deben sumar más de 0%.');return;}
+    D.cols.forEach(c=>c.name=c.name.trim());D.cu.forEach(c=>c.n=c.n.trim());
+    const m=[],old=AREA.cols;
+    D.cols.forEach(c=>{const p=old.find(x=>x.id===c.id);
+      if(!p){if(!c.off)m.push(`Agregas la columna «${esc(c.name)}» (${c.w}%)`);return;}
+      if(!p.off&&c.off)m.push(`Quitas «${esc(p.name)}» (sus notas quedan guardadas)`);
+      else if(p.off&&!c.off)m.push(`Restauras «${esc(c.name)}»`);
+      if(!c.off){if(p.name!==c.name)m.push(`Renombras «${esc(p.name)}» como «${esc(c.name)}»`);if(Number(p.w)!==Number(c.w))m.push(`Peso de «${esc(c.name)}»: ${p.w}% → ${c.w}%`);}
+    });
+    const ren=D.cu.filter(c=>c.o&&c.o!==c.n);
+    ren.forEach(c=>m.push(`Renombras el curso «${esc(c.o)}» como «${esc(c.n)}» (se actualizan sus notas)`));
+    D.cu.filter(c=>!c.o).forEach(c=>m.push(`Agregas el curso «${esc(c.n)}»`));
+    AREA.cursos.filter(n=>!D.cu.some(c=>c.o===n)).forEach(n=>m.push(`Quitas el curso «${esc(n)}» (sus notas quedan guardadas)`));
+    if(!m.length){ov.remove();return;}
+    askConfirm('¿Aplicar estos cambios?','<ul style="margin:0;padding-left:18px">'+m.map(x=>`<li>${x}</li>`).join('')+'</ul>','Sí, aplicar',async()=>{
+      for(const c of ren){
+        const {error}=await sb.from('grades').update({curso:c.n}).eq('area',AREA.id).eq('curso',c.o);
+        if(error){alert('Error actualizando notas: '+error.message);return;}
+        Object.values(DATA.records).forEach(rc=>{if(rc[c.o]){rc[c.n]=rc[c.o];delete rc[c.o];}});
+      }
+      const cfg={cursos:D.cu.map(c=>c.n),cursosOff:D.off,cols:D.cols};
+      const {error}=await sb.from('area_config').upsert({area:AREA.id,config:cfg,updated_by:session.user.id,updated_at:new Date().toISOString()});
+      if(error){alert('No se pudo guardar la configuración: '+error.message);return;}
+      applyConfig(cfg);ov.remove();render();
+    },false);
+  }
+  draw();
+}
+
 /* ---------- Carga de datos desde Supabase ---------- */
 async function loadAllData(){
   const {data:studs,error:e1} = await sb.from('students').select('*');
-  const {data:grds,error:e2} = await sb.from('grades').select('*');
+  const {data:grds,error:e2} = await sb.from('grades').select('*').eq('area',AREA.id);
   if(e1||e2){ alert('Error cargando datos: '+((e1||e2).message)); return; }
   DATA.students = studs.map(s=>({id:s.id,nombre:s.nombre,grado:s.grado}));
   DATA.records = {};
   grds.forEach(r=>{
     DATA.records[r.sid]=DATA.records[r.sid]||{};
     DATA.records[r.sid][r.curso]=DATA.records[r.sid][r.curso]||{};
-    DATA.records[r.sid][r.curso][r.bim]={cN1:r.c_n1,cN2:r.c_n2,lN1:r.l_n1,lN2:r.l_n2,conN1:r.con_n1,conN2:r.con_n2,exM:r.ex_m,exB:r.ex_b};
+    DATA.records[r.sid][r.curso][r.bim]={...(r.scores||{})};
   });
 }
 async function upsertGradeRow(sid,curso,bim){
-  const r=getRec(sid,curso,bim)||{};
-  const {error}=await sb.from('grades').upsert({
-    sid,curso,bim,c_n1:r.cN1??null,c_n2:r.cN2??null,l_n1:r.lN1??null,l_n2:r.lN2??null,
-    con_n1:r.conN1??null,con_n2:r.conN2??null,ex_m:r.exM??null,ex_b:r.exB??null
-  },{onConflict:'sid,curso,bim'});
+  const r=getRec(sid,curso,bim)||{},scores={};
+  AREA.cols.forEach(c=>{scores[c.id]=r[c.id]??null;});
+  const {error}=await sb.from('grades').upsert({sid,area:AREA.id,curso,bim,scores},{onConflict:'sid,area,curso,bim'});
   if(error) alert('Error guardando: '+error.message);
 }
 async function insertStudent(nombre,grado){
@@ -164,55 +525,74 @@ function renderLogin(err,mode,info){
   mode=mode||'login';
   const isReg=mode==='registro';
   document.getElementById('root').innerHTML=`
-  <div class="login-wrap"><div class="login-card">
-    <h2>Registro de Notas</h2>
-    <div class="sub" style="font-family:'Segoe UI',Arial,sans-serif;color:#666;margin-bottom:16px">Colegio Los Ángeles de Jesús</div>
-    <label>Correo</label><input id="loginEmail" type="email">
-    <label>Contraseña${isReg?' (mínimo 6 caracteres)':''}</label><input id="loginPass" type="password">
-    ${isReg?'<label>Repite la contraseña</label><input id="loginPass2" type="password">':''}
-    <button class="btn" id="loginBtn" style="width:100%">${isReg?'Crear cuenta':'Ingresar'}</button>
-    <div class="login-err">${err||''}</div>
-    ${info?`<div style="color:#2f6b4a;font-size:.85rem;margin-top:8px">${info}</div>`:''}
-    <div style="margin-top:14px;font-size:.85rem"><a href="#" id="toggleMode" style="color:#25405e">${isReg?'Ya tengo cuenta: ingresar':'¿No tienes cuenta? Crear cuenta'}</a></div>
+  <div class="login-wrap"><div class="login-wm">Los Ángeles</div><div class="login-card">
+    <div class="lg-hd"><div class="lg-ci">LA</div><div><div class="lg-tt">Registro de notas</div><span class="lg-ul">Colegio Los Ángeles de Jesús</span></div></div>
+    <div class="lg-fl"><label>Usuario o correo</label><input id="loginEmail" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"></div>
+    <div class="lg-fl"><label>Contraseña${isReg?' (mínimo 6 caracteres)':''}</label><input id="loginPass" type="password" autocomplete="${isReg?'new-password':'current-password'}"></div>
+    ${isReg?'<div class="lg-fl"><label>Repite la contraseña</label><input id="loginPass2" type="password"></div><div class="lg-fl"><label>Tu área</label><select id="loginArea">'+Object.entries(AREAS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')+'</select></div>':''}
+    <div class="lg-ft"><div class="lg-dt">•••</div><button class="pb" id="loginBtn">${isReg?'Crear cuenta':'Ingresar'}</button></div>
+    <div class="lg-ex"><div class="login-err">${err||''}</div>
+    ${info?`<div style="color:#2f6b4a;margin-top:8px">${info}</div>`:''}
+    <div style="margin-top:10px"><a href="#" id="toggleMode">${isReg?'Ya tengo cuenta: ingresar':'¿No tienes cuenta? Crear cuenta'}</a></div></div>
   </div></div>`;
+  const chk=()=>{const b=document.getElementById('loginBtn');if(b)b.classList.toggle('on',document.getElementById('loginEmail').value.trim()!==''&&document.getElementById('loginPass').value!=='');};
+  ['loginEmail','loginPass'].forEach(id=>document.getElementById(id).addEventListener('input',chk));setTimeout(chk,400);
   document.getElementById('toggleMode').onclick=e=>{e.preventDefault();renderLogin('',isReg?'login':'registro');};
   document.getElementById('loginBtn').onclick=async()=>{
-    const email=document.getElementById('loginEmail').value.trim();
+    const email=aCorreo(document.getElementById('loginEmail').value);
     const password=document.getElementById('loginPass').value;
     if(isReg){
       if(password.length<6){renderLogin('La contraseña debe tener al menos 6 caracteres.','registro');return;}
       if(password!==document.getElementById('loginPass2').value){renderLogin('Las contraseñas no coinciden.','registro');return;}
-      const {data,error}=await sb.auth.signUp({email,password});
+      const area=document.getElementById('loginArea').value;const {data,error}=await sb.auth.signUp({email,password,options:{data:{area}}});
       if(error){renderLogin(error.message,'registro');return;}
-      if(data.session){ session=data.session; await loadAllData(); tab='estudiantes'; render(); return; }
+      if(data.session){ session=data.session; if(await afterLogin(area)){tab='estudiantes';render();} return; }
       renderLogin('','login','Cuenta creada. Revisa tu correo y confirma el enlace; luego ingresa aquí.');
       return;
     }
     const {data,error}=await sb.auth.signInWithPassword({email,password});
     if(error){ renderLogin(error.message); return; }
     session=data.session;
-    await loadAllData();
-    tab='estudiantes'; render();
+    if(await afterLogin()){tab='estudiantes';render();}
   };
 }
 
 /* ---------- Layout / tabs ---------- */
 let tab='estudiantes';
+function confirmLogout(){
+  if(document.getElementById('logoutOv'))return;
+  const n=typeof modCount==='function'?modCount():0;
+  const o=document.createElement('div');o.id='logoutOv';o.className='overlay';
+  o.innerHTML=`<div class="box" role="dialog" aria-modal="true" style="max-width:360px;width:88vw"><h3 style="margin:0 0 8px;font-size:1.2rem">¿Cerrar sesión?</h3><div style="color:#667085;font-size:.92rem;line-height:1.5">Vas a salir de la aplicación.${n?` Tienes <b>${n}</b> ${n===1?'nota modificada':'notas modificadas'} sin guardar que se perderán.`:''}</div><div class="lo-btns"><button class="btn ghost" id="loNo">Cancelar</button><button class="btn warn" id="loYes">Sí, salir</button></div></div>`;
+  document.body.appendChild(o);
+  const onKey=e=>{if(e.key==='Escape')close();};
+  const close=()=>{o.remove();document.removeEventListener('keydown',onKey);};
+  document.addEventListener('keydown',onKey);
+  o.onclick=e=>{if(e.target===o)close();};
+  document.getElementById('loNo').onclick=close;
+  document.getElementById('loYes').onclick=async()=>{close();await sb.auth.signOut();session=null;renderLogin();};
+  document.getElementById('loNo').focus();
+}
 function renderShell(){
   document.getElementById('root').innerHTML=`
   <div class="app">
   <nav>
-    <h1>Registro de Notas<br><span style="opacity:.6;font-size:.75rem">Los Ángeles de Jesús</span></h1>
-    <button data-tab="estudiantes">Estudiantes</button>
-    <button data-tab="registro">Registro de notas</button>
-    <button data-tab="analisis">Análisis</button>
-    <button data-tab="reportes">Reportes</button>
-    <button class="signout no-print" id="signOutBtn" style="margin-top:20px;background:none;border:none;color:#cdd6e0;text-align:left;padding:12px 20px;cursor:pointer">Cerrar sesión</button>
+    <div class="brand">Los Ángeles<small>Registro de Notas${AREA.name?' · '+esc(AREA.name):''}</small></div>
+    <button class="menu-toggle no-print" id="menuBtn" aria-label="Abrir menú"><span>${({estudiantes:'Estudiantes',registro:'Registro de notas',analisis:'Análisis',reportes:'Reportes',admin:'Administración'})[tab]||'Menú'}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <div class="nav-links">
+      <button data-tab="estudiantes">Estudiantes</button>
+      <button data-tab="registro">Registro de notas</button>
+      <button data-tab="analisis">Análisis</button>
+      <button data-tab="reportes">Reportes</button>
+      ${ISADMIN?'<button data-tab="admin">Administración</button>':''}
+      <button class="signout no-print" id="signOutBtn">Cerrar sesión</button>
+    </div>
   </nav>
   <main id="main"></main>
   </div>`;
   document.querySelectorAll('nav button[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render();});
-  document.getElementById('signOutBtn').onclick=async()=>{await sb.auth.signOut();session=null;renderLogin();};
+  document.getElementById('signOutBtn').onclick=confirmLogout;
+  document.getElementById('menuBtn').onclick=()=>document.querySelector('nav').classList.toggle('open');
 }
 
 function render(){
@@ -223,13 +603,14 @@ function render(){
   if(tab==='registro')m.innerHTML=viewRegistro();
   if(tab==='analisis')m.innerHTML=viewAnalisis();
   if(tab==='reportes')m.innerHTML=viewReportes();
+  if(tab==='admin')m.innerHTML=viewAdmin();
   wire();
 }
 
 function viewEstudiantes(){
   const rows=[...DATA.students].sort((a,b)=>a.grado-b.grado||a.nombre.localeCompare(b.nombre))
     .map(s=>`<tr><td>${esc(s.nombre)}</td><td>${s.grado}°</td>
-    <td><button class="btn danger" data-del="${s.id}">Eliminar</button></td></tr>`).join('');
+    <td>${ISADMIN?`<button class="btn danger" data-del="${s.id}">Eliminar</button>`:''}</td></tr>`).join('');
   return `<h2>Estudiantes</h2><div class="sub">${DATA.students.length} alumnos cargados (1° a 5° de secundaria) — datos en la nube (Supabase).</div>
   <div class="card"><div class="row">
     <div><label>Nombre completo</label><input id="nName" placeholder="Nombre y apellidos"></div>
@@ -237,11 +618,12 @@ function viewEstudiantes(){
     <button class="btn" id="addStudent">Agregar alumno</button>
   </div></div>
   <div class="card">
-    <b style="font-family:Georgia,serif">Respaldo en Excel</b>
+    <b style="font-family:inherit">Respaldo en Excel</b>
     <div class="sub" style="margin:6px 0 12px">Descarga tus alumnos y notas a un Excel, o sube un Excel con la misma estructura para actualizar la nube.</div>
     <div class="row" style="margin-bottom:0">
       <button class="btn ghost" id="exportXlsx">Exportar a Excel</button>
       <div><label>Importar Excel (hoja "Notas")</label><input type="file" id="importXlsx" accept=".xlsx,.xls"></div>
+      <button class="btn" id="updateDbBtn" disabled>Actualizar base de datos</button>
     </div>
     <div id="importMsg" class="sub" style="margin:8px 0 0">${window._importMsg||''}</div>
   </div>
@@ -249,223 +631,350 @@ function viewEstudiantes(){
 }
 
 function fieldInput(sid,curso,bim,field,val){
-  return `<input type="number" min="0" max="20" class="nota-in" data-sid="${sid}" data-field="${field}" value="${val??''}">`;
+  return cellHtml(`data-sid="${sid}" data-field="${field}"`,val);
 }
 
-function viewRegistroCurso(){
+/* ---------- REGISTRO: vistas por alumno y pendientes ---------- */
+/* ---------- Protección de notas guardadas y resaltado de cambios ---------- */
+const LKI='<svg class="lki" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+function cellHtml(attrs,val){
+  const v=(val===null||val===undefined)?'':String(val),lk=v!=='';
+  return `<div class="c${lk?' lk':''}"><input type="text" inputmode="decimal" autocomplete="off" class="nota-in" ${attrs} data-o="${v}" value="${v}"${lk?' readonly':''}>${LKI}<div class="pv"></div></div>`;
+}
+const CHG='<div class="chgbar"><span id="chgCnt">Sin cambios</span><button class="btn ghost" id="undoChg">Descartar cambios</button><div style="flex-basis:100%;font-size:.78rem;color:#777;font-family:\'Segoe UI\',Arial">Las notas guardadas tienen candado: tócalas dos veces para editarlas. En amarillo ves lo que cambiaste y su valor anterior.</div></div>';
+const normN=v=>v===''||v===null||v===undefined?'':String(Number(v));
+function modCount(){return [...document.querySelectorAll('.nota-in[data-o]')].filter(i=>normN(i.value)!==normN(i.dataset.o)).length;}
+function updCount(){
+  const n=modCount(),c=document.getElementById('chgCnt');
+  if(c){c.textContent=n?(n+(n===1?' cambio sin guardar':' cambios sin guardar')):'Sin cambios';c.classList.toggle('on',n>0);}
+  ['saveGrades','saveAlumno'].forEach(id=>{const b=document.getElementById(id);if(b&&!b.disabled){if(!b.dataset.base)b.dataset.base=b.textContent;b.textContent=n?`${b.dataset.base} (${n})`:b.dataset.base;}});
+}
+function wireLock(m){
+  m.querySelectorAll('.nota-in[data-o]').forEach(inp=>{
+    const box=inp.parentElement,pv=box.querySelector('.pv');let t=0;
+    const upd=()=>{
+      const md=normN(inp.value)!==normN(inp.dataset.o);
+      box.classList.toggle('md',md);box.classList.toggle('lk',inp.readOnly);
+      pv.textContent=md?'antes: '+(inp.dataset.o===''?'vacío':inp.dataset.o):'';
+    };
+    const unlock=()=>{inp.readOnly=false;upd();inp.focus();inp.select();};
+    inp.addEventListener('click',()=>{if(!inp.readOnly)return;const n=Date.now();if(n-t<500)unlock();else t=n;});
+    inp.addEventListener('keydown',e=>{if(inp.readOnly&&(e.key==='F2'||e.key===' ')){e.preventDefault();unlock();}});
+    inp.addEventListener('input',()=>{upd();updCount();});
+    inp.addEventListener('blur',()=>{if(!inp.readOnly&&normN(inp.value)===normN(inp.dataset.o)&&inp.dataset.o!==''){inp.value=inp.dataset.o;inp.readOnly=true;}upd();});
+    upd();
+  });
+  const u=document.getElementById('undoChg');
+  if(u)u.onclick=()=>{
+    m.querySelectorAll('.nota-in[data-o]').forEach(i=>{
+      if(normN(i.value)!==normN(i.dataset.o)){i.value=i.dataset.o;i.dispatchEvent(new Event('input',{bubbles:true}));}
+      i.readOnly=i.dataset.o!=='';i.dispatchEvent(new Event('blur'));
+    });
+    window._dirtyA=false;updCount();
+  };
+  updCount();
+}
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t&&['rGrado','rCurso','rBim'].includes(t.id)&&modCount()>0&&!confirm('Tienes notas modificadas sin guardar. Si continúas, se perderán. ¿Continuar?')){
+    const o=[...t.options].find(x=>x.defaultSelected);if(o)t.value=o.value;
+    e.stopImmediatePropagation();e.stopPropagation();
+  }
+},true);
+document.addEventListener('click',e=>{
+  const b=e.target.closest&&e.target.closest('nav button,[data-rmode]');
+  if(b&&b.id!=='signOutBtn'&&b.id!=='menuBtn'&&document.getElementById('saveGrades')&&modCount()>0&&!confirm('Tienes notas modificadas sin guardar. Si continúas, se perderán. ¿Continuar?')){
+    e.stopImmediatePropagation();e.preventDefault();
+  }
+},true);
+window.addEventListener('beforeunload',e=>{if(modCount()>0){e.preventDefault();e.returnValue='';}});
+
+function viewRegistro(){
+  const md=window._rmode||'curso';
+  const bar=`<div class="tabbar">${[['curso','Por curso'],['alumno','Por alumno'],['pend','Pendientes de entrega']].map(x=>`<button data-rmode="${x[0]}" class="${md===x[0]?'active':''}">${x[1]}</button>`).join('')}</div>`;
+  return `<div class="areabar">${ISADMIN?`<select id="admArea" class="chip-sel">${Object.entries(AREAS).map(([k,v])=>`<option value="${k}" ${k===AREA.id?'selected':''}>Área: ${v}</option>`).join('')}</select>`:`<span class="chip">Área: ${esc(AREA.name)}</span>`}<button class="btn ghost" id="cfgBtn">Configurar cursos y columnas</button></div>`+bar+(md==='alumno'?viewRegAlumno():md==='pend'?viewPend():viewRegCurso());
+}
+function viewRegAlumno(){
   const gs=grados();
-  const g=window._rg||gs[0], curso=window._rc||CURSOS[0], bim=window._rb||3;
+  if(!gs.length)return '<h2>Registro de notas</h2><div class="empty">No hay alumnos.</div>';
+  const g=gs.find(x=>x==window._rg)??gs[0],bim=window._rb||3,list=studentsOf(g);
+  window._dirtyA=false;
+  const sel=`<div class="row"><div><label>Grado</label><select id="raGrado">${gs.map(x=>`<option value="${x}" ${x==g?'selected':''}>${x}°</option>`).join('')}</select></div>
+    <div><label>Bimestre</label><select id="raBim">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div></div>`;
+  if(!list.length)return `<h2>Registro por alumno</h2>${sel}<div class="empty">No hay alumnos en ese grado.</div>`;
+  const s=list.find(x=>x.id===window._ras)||list[0];window._ras=s.id;
+  const idx=list.indexOf(s);
+  const F=acols().map(c=>c.id);
+  const rows=CURSOS.map((c,ci)=>{
+    const r=getRec(s.id,c,bim)||{},prom=promAlumnoCurso(s.id,c,bim),p=pctLleno(r);
+    return `<tr><td><b>${esc(c)}</b></td>${F.map(k=>`<td>${cellHtml(`data-sid="${s.id}" data-curso="${esc(c)}" data-ci="${ci}" data-field="${k}"`,r[k])}</td>`).join('')}<td class="${estadoClass(prom)}">${prom??'—'}</td><td id="pctc-${ci}" style="font-weight:600;color:${pctColor(p)}">${p}%</td></tr>`;
+  }).join('');
+  const gen=promAlumnoGeneral(s.id,bim);
+  return `<h2>Registro por alumno</h2><div class="sub">Elige un alumno y registra todas sus notas del bimestre. Al cambiar de alumno, las notas escritas se guardan solas.</div>${sel}
+  <div class="row"><div style="flex:2 1 220px"><label>Alumno</label><select id="raAlumno">${list.map(x=>`<option value="${x.id}" ${x.id===s.id?'selected':''}>${esc(x.nombre)}</option>`).join('')}</select></div></div>
+  <div style="display:flex;gap:10px;margin:4px 0 12px"><button class="btn ghost" style="flex:1" data-rnav="-1" ${idx===0?'disabled':''}>◀ Anterior</button><button class="btn ghost" style="flex:1" data-rnav="1" ${idx===list.length-1?'disabled':''}>Siguiente ▶</button></div>
+  <div class="card"><b style="font-family:inherit;font-size:1.05rem">${esc(s.nombre)}</b> <span class="sub">· ${g}° · alumno ${idx+1} de ${list.length} · promedio general: <b>${gen??'—'}</b></span></div>
+  ${CHG}<div style="overflow-x:auto"><table class="stk"><thead><tr><th>Curso</th>${acols().map(c=>`<th>${esc(c.name)}<div class="pesoh">${c.w}%</div></th>`).join('')}<th>Promedio</th><th>% llenado</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <div style="margin-top:14px"><button class="btn" id="saveAlumno">Guardar notas de ${esc(s.nombre.split(' ').slice(-1)[0])}</button></div>`;
+}
+const BASEC={'Razonamiento Matemático':'Razonamiento Mat.'};
+function pendData(g,bim){
+  const list=studentsOf(g),vacio=v=>v===null||v===undefined||v==='',cats=pendCats();
+  const rows=list.map(s=>{
+    const sin=CURSOS.every(c=>{const r=getRec(s.id,c,bim);return !r||CAMPOS.every(k=>vacio(r[k]));});
+    const it=cats.map(([e,cs])=>sin?[]:CURSOS.map(c=>{const r=getRec(s.id,c,bim)||{},m=cs.filter(k=>vacio(r[k.id])).map(k=>k.sh||k.name);return m.length?`${BASEC[c]||c} (${m.join(', ')})`:null;}).filter(Boolean));
+    return{s,sin,it};
+  });
+  const pend=rows.filter(x=>x.sin||x.it.some(a=>a.length));
+  return{pend,cats,total:list.length,ok:list.length-pend.length};
+}
+function viewPend(){
+  const gs=grados();
+  if(!gs.length)return '<h2>Pendientes de entrega</h2><div class="empty">No hay alumnos.</div>';
+  const g=gs.find(x=>x==window._rg)??gs[0],bim=window._rb||3,d=pendData(g,bim);
+  const cell=(x,l)=>x.sin?'<span style="color:#B4443D;font-style:italic">Sin registro</span>':l.length?l.map(esc).join('<br>'):'—';
+  return `<h2>${esc(pendTitulo())}</h2><div class="sub">${esc(pendNota())}</div>
+  <div class="row"><div><label>Grado</label><select id="rpGrado">${gs.map(x=>`<option value="${x}" ${x==g?'selected':''}>${x}°</option>`).join('')}</select></div>
+  <div><label>Bimestre</label><select id="rpBim">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin:4px 0 14px"><button class="btn" id="pdfPend">Descargar PDF de ${g}°</button><button class="btn ghost" id="pdfPendAll">Descargar PDF de todos los grados</button></div>
+  <div class="card"><b style="font-family:inherit;font-size:1.05rem">${g}° de Secundaria</b><div class="sub" style="margin:4px 0 10px"><b>${d.pend.length} de ${d.total}</b> alumnos con pendientes · <b>${d.ok}</b> al día</div>
+  ${d.pend.length?`<div style="overflow-x:auto"><table><thead><tr><th>Alumno</th>${d.cats.map(([e])=>`<th>${esc(pendHead(e))}</th>`).join('')}</tr></thead><tbody>${d.pend.map(x=>`<tr style="vertical-align:top;line-height:1.55"><td><b>${esc(x.s.nombre)}</b></td>${d.cats.map((_,i)=>`<td>${cell(x,x.it[i])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:'<div class="empty">Todos los alumnos están al día 🎉</div>'}</div>`;
+}
+function descargarPendientes(gl,bim){
+  if(!window.jspdf){alert('No se pudo cargar el generador de PDF. Revisa tu conexión e inténtalo de nuevo.');return;}
+  const {jsPDF}=window.jspdf,doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const NAVY=[27,42,65],RED=[180,68,61],ORD={1:'1.er',2:'2.º',3:'3.er',4:'4.º'},NG={1:'1ro',2:'2do',3:'3ro',4:'4to',5:'5to'};
+  let first=true;
+  gl.forEach(g=>{
+    if(!studentsOf(g).length)return;
+    if(!first)doc.addPage();first=false;
+    const d=pendData(g,bim);
+    doc.setFont('helvetica','bold');doc.setFontSize(16);doc.setTextColor(...NAVY);doc.text(pendTitulo(),14,16);
+    doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(90,90,90);doc.text(`Colegio Los Ángeles de Jesús · ${ORD[bim]} bimestre · ${g}° de Secundaria`,14,22);
+    doc.setFontSize(8.5);
+    const nt=doc.splitTextToSize(pendNota()+' Entre paréntesis se indica qué nota falta.',182);
+    doc.text(nt,14,28);
+    const y=28+nt.length*4+4;
+    doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(...NAVY);doc.text(`${g}° de Secundaria`,14,y);
+    doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(90,90,90);doc.text(`${d.pend.length} de ${d.total} alumnos con pendientes · ${d.ok} al día`,14,y+5.5);
+    if(!d.pend.length){doc.text('Todos los alumnos están al día.',14,y+14);return;}
+    doc.autoTable({theme:'grid',startY:y+9,margin:{left:14,right:14},
+      head:[['Alumno',...d.cats.map(([e])=>pendHead(e))]],
+      body:d.pend.map(x=>[x.s.nombre,...d.cats.map((_,i)=>x.sin?'Sin registro':(x.it[i].join('\n')||'-'))]),
+      headStyles:{fillColor:[236,231,218],textColor:[68,68,68],fontStyle:'bold',fontSize:9,lineColor:[216,210,194]},
+      styles:{fontSize:9,cellPadding:2,lineColor:[216,210,194],textColor:[32,35,43],fillColor:[255,255,255],valign:'top'},
+      columnStyles:Object.fromEntries([[0,{cellWidth:42,fontStyle:'bold'}],...d.cats.map((_,i)=>[i+1,{cellWidth:140/d.cats.length}])]),
+      didParseCell:h=>{if(h.section==='body'&&h.cell.raw==='Sin registro'){h.cell.styles.textColor=RED;h.cell.styles.fontStyle='italic';}}});
+  });
+  doc.save(gl.length===1?`Pendientes_${NG[gl[0]]||gl[0]}_Secundaria.pdf`:'Pendientes_Todos_los_grados.pdf');
+}
+async function guardarAlumno(){
+  const m=document.getElementById('main'),sid=window._ras,bim=window._rb||3;
+  m.querySelectorAll('.nota-in[data-curso]').forEach(i=>setField(sid,i.dataset.curso,bim,i.dataset.field,i.value));
+  for(const c of CURSOS)await upsertGradeRow(sid,c,bim);
+  window._dirtyA=false;
+}
+async function rnav(fn){if(window._dirtyA)await guardarAlumno();fn();render();}
+function wireReg(){
+  const m=document.getElementById('main');if(!m)return;
+  wireLock(m);
+  const cb=document.getElementById('cfgBtn');if(cb)cb.onclick=()=>{if(modCount()>0){alert('Primero guarda las notas que modificaste y luego abre la configuración.');return;}openConfig();};
+  const sel=(id,fn)=>{const e=document.getElementById(id);if(e)e.onchange=()=>rnav(()=>fn(e.value));};
+  const first=g=>{const l=studentsOf(g);return l.length?l[0].id:null;};
+  m.querySelectorAll('[data-rmode]').forEach(b=>b.onclick=()=>rnav(()=>{window._rmode=b.dataset.rmode;}));
+  sel('raGrado',v=>{window._rg=Number(v);window._ras=first(Number(v));});
+  sel('rpGrado',v=>{window._rg=Number(v);});
+  sel('raAlumno',v=>{window._ras=v;});
+  sel('raBim',v=>{window._rb=Number(v);});sel('rpBim',v=>{window._rb=Number(v);});
+  m.querySelectorAll('[data-rnav]').forEach(b=>b.onclick=()=>rnav(()=>{const l=studentsOf(window._rg||grados()[0]),i=l.findIndex(x=>x.id===window._ras),n=l[i+Number(b.dataset.rnav)];if(n)window._ras=n.id;}));
+  m.querySelectorAll('.nota-in[data-curso]').forEach(i=>i.addEventListener('input',()=>{
+    window._dirtyA=true;
+    const f=[...m.querySelectorAll(`.nota-in[data-ci="${i.dataset.ci}"]`)],p=Math.round(f.filter(x=>x.value!=='').length/f.length*100),c=document.getElementById('pctc-'+i.dataset.ci);
+    if(c){c.textContent=p+'%';c.style.color=pctColor(p);}}));
+  const sa=document.getElementById('saveAlumno');
+  if(sa)sa.onclick=async()=>{sa.textContent='Guardando...';sa.disabled=true;await guardarAlumno();sa.textContent='Guardado ✓';setTimeout(()=>render(),500);};
+  const pd=document.getElementById('pdfPend');if(pd)pd.onclick=()=>descargarPendientes([window._rg||grados()[0]],window._rb||3);
+  const pa=document.getElementById('pdfPendAll');if(pa)pa.onclick=()=>descargarPendientes(grados(),window._rb||3);
+}
+
+function viewRegCurso(){
+  const gs=grados();
+  const g=window._rg||gs[0], curso=(CURSOS.includes(window._rc)?window._rc:CURSOS[0]), bim=window._rb||3;
   const list=studentsOf(g);
   const rows=list.map(s=>{
     const r=getRec(s.id,curso,bim)||{};
     const prom=promAlumnoCurso(s.id,curso,bim);
     return `<tr>
       <td>${esc(s.nombre)}</td>
-      <td>${fieldInput(s.id,curso,bim,'cN1',r.cN1)}</td><td>${fieldInput(s.id,curso,bim,'cN2',r.cN2)}</td>
-      <td>${fieldInput(s.id,curso,bim,'lN1',r.lN1)}</td><td>${fieldInput(s.id,curso,bim,'lN2',r.lN2)}</td>
-      <td>${fieldInput(s.id,curso,bim,'conN1',r.conN1)}</td><td>${fieldInput(s.id,curso,bim,'conN2',r.conN2)}</td>
-      <td>${fieldInput(s.id,curso,bim,'exM',r.exM)}</td><td>${fieldInput(s.id,curso,bim,'exB',r.exB)}</td>
+      ${acols().map(c=>`<td>${fieldInput(s.id,curso,bim,c.id,r[c.id])}</td>`).join('')}
       <td class="${estadoClass(prom)}">${prom??'—'}</td>
       ${pctCell(s.id,pctLleno(r))}
     </tr>`;
   }).join('');
   const completos=list.filter(s=>pctLleno(getRec(s.id,curso,bim))===100).length;
-  return `<div class="sub">El Promedio se calcula solo (redondeado hacia arriba). Al guardar, se sube directo a la nube.</div>
+  return `<h2>Registro de notas</h2><div class="sub">El Promedio se calcula solo (redondeado hacia arriba). Al guardar, se sube directo a la nube.</div>
   <div class="row">
     <div><label>Grado</label><select id="rGrado">${gs.map(x=>`<option value="${x}" ${x==g?'selected':''}>${x}°</option>`).join('')}</select></div>
     <div><label>Curso</label><select id="rCurso">${CURSOS.map(c=>`<option ${c==curso?'selected':''}>${esc(c)}</option>`).join('')}</select></div>
     <div><label>Bimestre</label><select id="rBim">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
   </div>
-  ${list.length?`<div style="overflow-x:auto"><table><thead><tr><th>Alumno</th><th>Cuad. N1</th><th>Cuad. N2</th><th>Libro N1</th><th>Libro N2</th><th>Cond. N1</th><th>Cond. N2</th><th>Ex.Mensual</th><th>Ex.Bimestral</th><th>Promedio</th><th>% llenado</th></tr></thead><tbody>${rows}</tbody></table></div>
+  ${list.length?`${CHG}<div style="overflow-x:auto"><table><thead><tr><th>Alumno</th>${acols().map(c=>`<th>${esc(c.name)}<div class="pesoh">${c.w}%</div></th>`).join('')}<th>Promedio</th><th>% llenado</th></tr></thead><tbody>${rows}</tbody></table></div>
   <div class="sub" id="resumenLleno" style="margin:10px 0 0">${completos} de ${list.length} alumnos con todas sus notas completas.</div>
   <div style="margin-top:14px"><button class="btn" id="saveGrades">Guardar notas</button></div>`
   :'<div class="empty">No hay alumnos en ese grado.</div>'}`;
 }
 
-const ORD={1:'1.er',2:'2.º',3:'3.er',4:'4.º'};
-function cortoCurso(c){return c==='Razonamiento Matemático'?'Razonamiento Mat.':c;}
-function pendientesAlumno(sid,bim){
-  let algo=false; const cu=[], li=[];
-  const falta=(a,b)=>{const m=[]; if(a===null||a===undefined)m.push('N1'); if(b===null||b===undefined)m.push('N2'); return m;};
-  CURSOS.forEach(c=>{
-    const r=getRec(sid,c,bim)||{};
-    if(CAMPOS.some(k=>r[k]!==null&&r[k]!==undefined))algo=true;
-    const mc=falta(r.cN1,r.cN2), ml=falta(r.lN1,r.lN2);
-    if(mc.length)cu.push(`${cortoCurso(c)} (${mc.join(', ')})`);
-    if(ml.length)li.push(`${cortoCurso(c)} (${ml.join(', ')})`);
-  });
-  return {sinRegistro:!algo,cu,li};
-}
-function datosPendientes(g,bim){
-  const list=studentsOf(g);
-  const filas=list.map(s=>({s,...pendientesAlumno(s.id,bim)})).filter(x=>x.sinRegistro||x.cu.length||x.li.length);
-  return {filas,total:list.length,alDia:list.length-filas.length};
-}
-function viewRegistro(){
-  const modo=window._regMode||'curso';
-  const body=modo==='alumno'?viewRegistroAlumno():(modo==='pendientes'?viewPendientes():viewRegistroCurso());
-  return `<h2>Registro de notas</h2>
-  <div class="tabbar" style="margin-top:10px">
-    <button data-rmode="curso" class="${modo==='curso'?'active':''}">Ingreso por curso</button>
-    <button data-rmode="alumno" class="${modo==='alumno'?'active':''}">Ingreso por alumno</button>
-    <button data-rmode="pendientes" class="${modo==='pendientes'?'active':''}">Pendientes de entrega</button>
-  </div>${body}`;
-}
-function viewRegistroAlumno(){
-  const gs=grados();
-  const g=window._ra_g||gs[0], bim=window._ra_b||3;
-  const list=studentsOf(g);
-  let sid=window._ra_sid; if(!list.find(s=>s.id===sid))sid=list[0]&&list[0].id;
-  window._ra_sid=sid;
-  const ctrl=`<div class="row">
-    <div><label>Grado</label><select id="raGrado">${gs.map(x=>`<option value="${x}" ${x==g?'selected':''}>${x}°</option>`).join('')}</select></div>
-    <div><label>Alumno</label><select id="raSid">${list.map(s=>`<option value="${s.id}" ${s.id===sid?'selected':''}>${esc(s.nombre)}</option>`).join('')}</select></div>
-    <div><label>Bimestre</label><select id="raBim">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
-  </div>`;
-  if(!sid)return `<div class="sub">Registra las notas de un alumno en todos sus cursos.</div>${ctrl}<div class="empty">No hay alumnos en ese grado.</div>`;
-  const rows=CURSOS.map((c,i)=>{
-    const rec=getRec(sid,c,bim); const r=rec||{};
-    const prom=computeProm(rec); const p=pctLleno(rec);
-    const cells=CAMPOS.map(f=>`<td><input type="number" min="0" max="20" class="nota-al" data-curso="${esc(c)}" data-field="${f}" value="${r[f]??''}"></td>`).join('');
-    return `<tr><td><b>${esc(c)}</b></td>${cells}<td class="${estadoClass(prom)}">${prom??'—'}</td><td id="pa-${i}" style="font-weight:600;color:${pctColor(p)}">${p}%</td></tr>`;
-  }).join('');
-  return `<div class="sub">Registra las notas de un alumno en todos sus cursos. Al guardar, se sube directo a la nube.</div>${ctrl}
-  <div style="overflow-x:auto"><table><thead><tr><th>Curso</th><th>Cuad. N1</th><th>Cuad. N2</th><th>Libro N1</th><th>Libro N2</th><th>Cond. N1</th><th>Cond. N2</th><th>Ex.Mensual</th><th>Ex.Bimestral</th><th>Promedio</th><th>% llenado</th></tr></thead><tbody>${rows}</tbody></table></div>
-  <div style="margin-top:14px"><button class="btn" id="saveAlumno">Guardar notas</button></div>`;
-}
-function viewPendientes(){
-  const gs=grados();
-  const g=window._pg||gs[0], bim=window._pb||3;
-  const {filas,total,alDia}=datosPendientes(g,bim);
-  const celda=(x,arr)=>x.sinRegistro?'<span style="color:var(--red);font-style:italic">Sin registro</span>':(arr.length?arr.map(esc).join('<br>'):'—');
-  const tabla=filas.length?`<table><thead><tr><th>Alumno</th><th>Cuadernos que faltan</th><th>Libros que faltan</th></tr></thead><tbody>${
-    filas.map(x=>`<tr><td style="vertical-align:top"><b>${esc(x.s.nombre)}</b></td><td style="vertical-align:top">${celda(x,x.cu)}</td><td style="vertical-align:top">${celda(x,x.li)}</td></tr>`).join('')
-  }</tbody></table>`:'<div class="empty">¡Todos los alumnos de este grado están al día!</div>';
-  return `<div class="row">
-    <div><label>Grado</label><select id="pdGrado">${gs.map(x=>`<option value="${x}" ${x==g?'selected':''}>${x}°</option>`).join('')}</select></div>
-    <div><label>Bimestre</label><select id="pdBim">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
-    <button class="btn ghost" id="pdfPend">Descargar PDF</button>
-  </div>
-  <div class="card">
-    <h3 style="margin:0 0 4px">Pendientes de entrega: cuadernos y libros</h3>
-    <div class="sub" style="margin-bottom:8px">Colegio Los Ángeles de Jesús · ${ORD[bim]} bimestre · ${g}° de Secundaria</div>
-    <div class="sub" style="margin-bottom:14px">Se consideran pendientes las notas de Cuaderno o Libro (N1 y N2) que están vacías. Entre paréntesis se indica qué nota falta. Un alumno sin ninguna nota registrada aparece como «Sin registro».</div>
-    <div style="margin-bottom:10px"><b>${g}° de Secundaria</b><br><span class="sub">${filas.length} de ${total} alumnos con pendientes · ${alDia} al día</span></div>
-    ${tabla}
-  </div>`;
-}
-function descargarPendientesPdf(g,bim){
-  if(!window.jspdf){alert('No se pudo cargar el generador de PDF. Revisa tu conexión e inténtalo de nuevo.');return;}
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  const NAVY=[27,42,65],RED=[180,68,61];
-  const {filas,total,alDia}=datosPendientes(g,bim);
-  doc.setFont('helvetica','bold');doc.setFontSize(15);doc.setTextColor(...NAVY);
-  doc.text('Pendientes de entrega: cuadernos y libros',14,16);
-  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(90,90,90);
-  doc.text(`Colegio Los Ángeles de Jesús · ${ORD[bim]} bimestre · ${g}° de Secundaria`,14,22);
-  const nota=doc.splitTextToSize('Se consideran pendientes las notas de Cuaderno o Libro (N1 y N2) que están vacías. Entre paréntesis se indica qué nota falta. Un alumno sin ninguna nota registrada aparece como «Sin registro».',182);
-  doc.setFontSize(8.5);doc.text(nota,14,28);
-  const y0=28+nota.length*4+4;
-  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...NAVY);
-  doc.text(`${g}° de Secundaria`,14,y0);
-  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(90,90,90);
-  doc.text(`${filas.length} de ${total} alumnos con pendientes · ${alDia} al día`,14,y0+5);
-  const body=filas.map(x=>[x.s.nombre,x.sinRegistro?'Sin registro':(x.cu.length?x.cu.join('\n'):'-'),x.sinRegistro?'Sin registro':(x.li.length?x.li.join('\n'):'-')]);
-  if(!body.length)body.push(['Todos los alumnos están al día','','']);
-  doc.autoTable({startY:y0+9,head:[['Alumno','Cuadernos que faltan','Libros que faltan']],body,theme:'grid',
-    headStyles:{fillColor:NAVY,fontSize:8.5},
-    styles:{fontSize:8,cellPadding:1.8,lineColor:[216,210,194],textColor:[32,35,43],valign:'top'},
-    alternateRowStyles:{fillColor:[236,231,218]},margin:{left:14,right:14},
-    columnStyles:{0:{cellWidth:38,fontStyle:'bold'}},
-    didParseCell:d=>{if(d.section==='body'&&d.cell.raw==='Sin registro'){d.cell.styles.textColor=RED;d.cell.styles.fontStyle='italic';}}});
-  doc.save(`Pendientes_${g}_Secundaria_${bim}_Bimestre.pdf`);
-}
+/* ---------- ANÁLISIS PROFESIONAL ---------- */
+const PAL=['#5B5BF0','#2f8fe0','#f2a65a','#e4606d','#14a38b'];
+const COMPS=[['cu','Cuaderno'],['li','Libro'],['co','Conducta'],['exM','Ex. Mensual'],['exB','Ex. Bimestral']];
+const BK=[['0–5',0,6],['6–9',6,10],['10–12',10,13],['13–14',13,15],['15–16',15,17],['17–18',17,19],['19–20',19,21]];
+const AF=()=>window._af=window._af||{g:'all',b:3};
+const r2=x=>Math.round(x*100)/100, mean=a=>a.length?r2(a.reduce((x,y)=>x+y,0)/a.length):null;
+const bset=b=>b==='all'?BIMS:[b];
+const col=v=>v===null?'#c4c9d4':v<13?'#E4606D':v<14?'#F4B860':v<15?'#8EC5F0':v<17?'#5B8DEF':'#5B5BF0';
+const tc=v=>(v!==null&&v>=13&&v<15)?'#17315a':'#fff';
+function pcs(sid,c,b){return mean(bset(b).map(x=>promAlumnoCurso(sid,c,x)).filter(v=>v!==null));}
+function pgen(sid,b){return mean(CURSOS.map(c=>pcs(sid,c,b)).filter(v=>v!==null));}
+function lst(){const g=AF().g;return g==='all'?DATA.students:studentsOf(g);}
+function vals(l,c,b){return l.map(s=>pcs(s.id,c,b)).filter(v=>v!==null);}
+function stat(a){const n=a.length;if(!n)return{n:0,avg:null,ap:null,min:null,max:null,sd:null,fail:0};const m=a.reduce((x,y)=>x+y,0)/n;return{n,avg:r2(m),ap:Math.round(a.filter(v=>v>=APROB).length/n*100),min:Math.min(...a),max:Math.max(...a),sd:r2(Math.sqrt(a.reduce((x,y)=>x+(y-m)**2,0)/n)),fail:a.filter(v=>v<APROB).length};}
+function comp(l,c,b,k){const g=groups().find(x=>x.k===k);if(!g)return null;const o=[];l.forEach(s=>bset(b).forEach(x=>{const v=gval(getRec(s.id,c,x),g);if(v!==null)o.push(v);}));return mean(o);}
+function weak(l,c,b){return compsList().map(([k,n])=>({l:n,v:comp(l,c,b,k)})).filter(x=>x.v!==null).sort((p,q)=>p.v-q.v)[0];}
+const empty=t=>`<div class="empty">${t||'Aún no hay notas registradas para este filtro.'}</div>`;
+const kpi=a=>`<div class="stat">${a.map(([v,l,c])=>`<div><b style="${c?'color:'+c:''}">${v}</b><span>${l}</span></div>`).join('')}</div>`;
+
+function filtBar(o={}){const f=AF(),gs=grados();return `<div class="row no-print">${o.g===false?'':`<div><label>Grado</label><select id="afG"><option value="all" ${f.g==='all'?'selected':''}>Todo el colegio</option>${gs.map(g=>`<option value="${g}" ${f.g==g?'selected':''}>${g}°</option>`).join('')}</select></div>`}${o.b===false?'':`<div><label>Bimestre</label><select id="afB"><option value="all" ${f.b==='all'?'selected':''}>Todo el año</option>${BIMS.map(b=>`<option value="${b}" ${f.b===b?'selected':''}>${BIM_LABEL[b]} Bimestre</option>`).join('')}</select></div>`}${o.x||''}<button class="btn ghost" onclick="window.print()">Imprimir</button></div>`;}
+function bars(items){return items.map(i=>`<div class="bar-row" ${i.a||''} data-tip="${esc(i.t||'')}" style="${i.a?'cursor:pointer':''}"><div class="bar-label">${esc(i.l)}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(0,(i.v||0)/20*100)}%;background:${col(i.v)}"></div><i class="thr"></i></div><b style="width:110px;font-size:.8rem">${i.v??'—'} <span style="font-weight:400;color:#777">${i.s||''}</span></b></div>`).join('')||empty('Sin datos');}
+function heat(b){return `<div style="overflow-x:auto"><table class="heat"><thead><tr><th></th>${CURSOS.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${grados().map(g=>`<tr><th>${g}°</th>${CURSOS.map(c=>{const st=stat(vals(studentsOf(g),c,b));return `<td data-gg="${g}" data-gc="${esc(c)}" data-tip="${g}° · ${esc(c)}: prom. ${st.avg??'—'} · ${st.ap??'—'}% aprobados · ${st.n} alumnos" style="background:${col(st.avg)};color:${tc(st.avg)}">${st.avg??'—'}</td>`}).join('')}</tr>`).join('')}</tbody></table></div>`;}
+function hist(a){const c=BK.map(([l,lo,hi])=>({l,lo,n:a.filter(v=>v>=lo&&v<hi).length})),mx=Math.max(1,...c.map(x=>x.n));return `<div style="display:flex;align-items:flex-end;gap:8px;height:160px;padding-top:6px">${c.map(x=>`<div style="flex:1;text-align:center;font:12px 'Segoe UI',Arial" data-tip="${x.n} alumnos con promedio ${x.l}"><b>${x.n}</b><div style="height:${x.n/mx*100}px;background:${col(x.lo)};border-radius:3px 3px 0 0;min-height:2px"></div><div style="color:#666;margin-top:4px">${x.l}</div></div>`).join('')}</div>`;}
+function line(S,L){const hid=window._hide||{},W=640,Ht=260,l=36,r=14,t=12,bt=28;const all=S.filter(s=>!hid[s.n]).flatMap(s=>s.d).filter(v=>v!==null);const lo=Math.max(0,Math.floor(Math.min(...all,APROB)-1)),hi=20;const X=i=>l+(L.length>1?i*(W-l-r)/(L.length-1):(W-l-r)/2),Y=v=>t+(hi-v)/(hi-lo)*(Ht-t-bt);let g='';for(let v=lo;v<=hi;v+=2)g+=`<line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" stroke="#eee"/><text x="${l-6}" y="${Y(v)+4}" font-size="10" text-anchor="end" fill="#888">${v}</text>`;g+=`<line x1="${l}" x2="${W-r}" y1="${Y(APROB)}" y2="${Y(APROB)}" stroke="#B4443D" stroke-dasharray="4 4"/><text x="${W-r}" y="${Y(APROB)-4}" font-size="10" text-anchor="end" fill="#B4443D">Aprobatoria ${APROB}</text>`;L.forEach((x,i)=>g+=`<text x="${X(i)}" y="${Ht-8}" font-size="11" text-anchor="middle" fill="#666">${x}</text>`);S.forEach(s=>{if(hid[s.n])return;let d='',pen=false;s.d.forEach((v,i)=>{if(v===null){pen=false;return;}d+=(pen?'L':'M')+X(i)+' '+Y(v);pen=true;});g+=`<path d="${d}" fill="none" stroke="${s.c}" stroke-width="${s.w||2}"/>`;s.d.forEach((v,i)=>{if(v!==null)g+=`<circle cx="${X(i)}" cy="${Y(v)}" r="5" fill="${s.c}" stroke="#fff" data-tip="${esc(s.n)} · ${L[i]}: ${v}"/>`;});});return `<div class="legend">${S.map(s=>`<button class="lg ${hid[s.n]?'off':''}" data-lg="${esc(s.n)}"><i style="background:${s.c}"></i>${esc(s.n)}</button>`).join('')}</div><div style="overflow-x:auto"><svg viewBox="0 0 ${W} ${Ht}" style="width:100%;min-width:560px;height:auto">${g}</svg></div>`;}
 
 function viewAnalisis(){
-  const gs=grados();
-  const modo=window._am||'alumno';
-  let body='';
-  if(modo==='alumno'){
-    const all=[...DATA.students].sort((a,b)=>a.grado-b.grado||a.nombre.localeCompare(b.nombre));
-    const sid=window._aSid||(all[0]&&all[0].id);
-    const bim=window._aBim||3;
-    body=`<div class="row">
-      <div><label>Alumno</label><select id="aSid">${all.map(s=>`<option value="${s.id}" ${s.id==sid?'selected':''}>${esc(s.nombre)} (${s.grado}°)</option>`).join('')}</select></div>
-      <div><label>Bimestre</label><select id="aBim">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
-    </div>`;
-    if(sid){
-      const rowsC=CURSOS.map(c=>{
-        const prom=promAlumnoCurso(sid,c,bim);
-        return `<tr><td>${esc(c)}</td><td class="${estadoClass(prom)}">${prom??'—'}</td></tr>`;
-      }).join('');
-      const gen=promAlumnoGeneral(sid,bim);
-      body+=`<table><thead><tr><th>Curso</th><th>Promedio ${BIM_LABEL[bim]} Bim.</th></tr></thead><tbody>${rowsC}</tbody></table>
-      <div class="stat"><div><b class="${estadoClass(gen)}">${gen??'—'}</b><span>Promedio general</span></div></div>`;
-    }
-  }
-  if(modo==='curso'){
-    const curso=window._aCurso||CURSOS[0], g=window._aGrado||'', bim=window._acBim||3;
-    body=`<div class="row">
-      <div><label>Curso</label><select id="aCurso">${CURSOS.map(c=>`<option ${c==curso?'selected':''}>${esc(c)}</option>`).join('')}</select></div>
-      <div><label>Grado (opcional)</label><select id="aGrado"><option value="">Todos</option>${gs.map(x=>`<option value="${x}" ${x==g?'selected':''}>${x}°</option>`).join('')}</select></div>
-      <div><label>Bimestre</label><select id="acBim">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
-    </div>`;
-    const list=g?studentsOf(g):[...DATA.students];
-    const proms=list.map(s=>({s,p:promAlumnoCurso(s.id,curso,bim)})).filter(x=>x.p!==null);
-    const aprobados=proms.filter(x=>x.p>=APROB).length;
-    const clase=proms.length?Math.round((proms.reduce((a,x)=>a+x.p,0)/proms.length)*100)/100:null;
-    const rows=proms.sort((a,b)=>b.p-a.p).map(x=>`<tr><td>${esc(x.s.nombre)}</td><td>${x.s.grado}°</td><td class="${estadoClass(x.p)}">${x.p}</td></tr>`).join('');
-    body+=`<div class="stat">
-      <div><b>${clase??'—'}</b><span>Promedio del curso</span></div>
-      <div><b>${aprobados}/${proms.length}</b><span>Aprobados</span></div>
-    </div>
-    ${proms.length?`<table><thead><tr><th>Alumno</th><th>Grado</th><th>Promedio</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">Sin notas registradas para este curso y bimestre.</div>'}`;
-  }
-  if(modo==='grado'){
-    const g=window._agGrado||gs[0], bim=window._agBim||3;
-    body=`<div class="row">
-      <div><label>Grado</label><select id="agGrado">${gs.map(x=>`<option value="${x}" ${x==g?'selected':''}>${x}°</option>`).join('')}</select></div>
-      <div><label>Bimestre</label><select id="agBimS">${BIMS.map(b=>`<option value="${b}" ${b==bim?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
-    </div>`;
-    const list=studentsOf(g);
-    const bars=CURSOS.map(c=>{
-      const proms=list.map(s=>promAlumnoCurso(s.id,c,bim)).filter(v=>v!==null);
-      const prom=proms.length?Math.round((proms.reduce((a,b)=>a+b,0)/proms.length)*100)/100:0;
-      return `<div class="bar-row"><div class="bar-label">${esc(c)}</div><div class="bar-track"><div class="bar-fill" style="width:${prom/20*100}%"></div></div><div>${prom||'—'}</div></div>`;
-    }).join('');
-    const gens=list.map(s=>promAlumnoGeneral(s.id,bim)).filter(v=>v!==null);
-    const genGrado=gens.length?Math.round((gens.reduce((a,b)=>a+b,0)/gens.length)*100)/100:null;
-    const enRiesgo=list.filter(s=>{const gp=promAlumnoGeneral(s.id,bim);return gp!==null&&gp<APROB;}).length;
-    body+=`<div class="stat">
-      <div><b class="${estadoClass(genGrado)}">${genGrado??'—'}</b><span>Promedio general del grado</span></div>
-      <div><b>${list.length}</b><span>Alumnos</span></div>
-      <div><b class="${enRiesgo?'desaprob':''}">${enRiesgo}</b><span>En riesgo (prom. &lt; ${APROB})</span></div>
-    </div>
-    <div class="card"><b style="font-family:Georgia,serif">Promedio por curso — ${g}°</b><div style="margin-top:12px">${bars}</div></div>`;
-  }
-  return `<h2>Análisis</h2><div class="sub">Explora el desempeño por alumno, por curso o por grado.</div>
-  <div class="tabbar">
-    <button data-am="alumno" class="${modo==='alumno'?'active':''}">Por alumno</button>
-    <button data-am="curso" class="${modo==='curso'?'active':''}">Por curso</button>
-    <button data-am="grado" class="${modo==='grado'?'active':''}">Por grado</button>
-  </div>${body}`;
+  const T=[['resumen','Resumen'],['cursos','Cursos'],['grados','Grados'],['alumnos','Alumno'],['riesgo','Riesgo y mérito'],['tend','Tendencias']];
+  const m=T.some(x=>x[0]===window._am)?window._am:'resumen';
+  const body={resumen:aResumen,cursos:aCursos,grados:aGrados,alumnos:aAlumno,riesgo:aRiesgo,tend:aTend}[m]();
+  return `<h2>Análisis</h2><div class="sub">Panel interactivo: filtra, pasa el mouse sobre los gráficos y haz clic en cursos, celdas o alumnos para ver el detalle. La línea punteada marca la nota aprobatoria (${APROB}).</div>
+  <div class="tabbar no-print">${T.map(x=>`<button data-am="${x[0]}" class="${m===x[0]?'active':''}">${x[1]}</button>`).join('')}</div>${body}`;
 }
+
+function aResumen(){
+  const l=lst(),b=AF().b,f=filtBar();
+  const cs=CURSOS.map(c=>({c,...stat(vals(l,c,b))})).filter(x=>x.n);
+  const gens=l.map(s=>pgen(s.id,b)).filter(v=>v!==null);
+  if(!gens.length)return f+empty();
+  const ries=gens.filter(v=>v<APROB).length,apG=Math.round((gens.length-ries)/gens.length*100);
+  const avance=Math.round(mean(l.flatMap(s=>CURSOS.flatMap(c=>bset(b).map(x=>pctLleno(getRec(s.id,c,x)))))));
+  const so=[...cs].sort((x,y)=>x.avg-y.avg),lo=so[0],hi=so[so.length-1];
+  const lowAp=[...cs].sort((x,y)=>x.ap-y.ap)[0],disp=[...cs].sort((x,y)=>y.sd-x.sd)[0],wk=weak(l,lo.c,b);
+  let cell=null;grados().forEach(g=>{if(AF().g!=='all'&&AF().g!=g)return;CURSOS.forEach(c=>{const st=stat(vals(studentsOf(g),c,b));if(st.n&&(!cell||st.avg<cell.avg))cell={g,c,avg:st.avg};});});
+  const ins=[`El curso con <b>menor promedio</b> es <b>${lo.c}</b> (${lo.avg}) y el de <b>mayor promedio</b> es <b>${hi.c}</b> (${hi.avg}).`,
+   lowAp.ap<100?`<b>${lowAp.c}</b> tiene la aprobación más baja: solo <b>${lowAp.ap}%</b> de los alumnos aprueba.`:'Todos los cursos tienen 100% de aprobación.',
+   wk?`En ${lo.c}, el componente más débil es <b>${wk.l}</b> (prom. ${wk.v}): buen punto de partida para reforzar.`:'',
+   cell?`El punto más crítico es <b>${cell.g}° en ${cell.c}</b>, con promedio ${cell.avg}.`:'',
+   `<b>${ries}</b> de ${gens.length} alumnos (${100-apG}%) tienen promedio general menor a ${APROB}.`,
+   disp&&disp.sd>=2.5?`<b>${disp.c}</b> tiene el rendimiento más desigual (desv. ${disp.sd}): conviven alumnos muy altos y muy bajos.`:''].filter(Boolean);
+  return f+kpi([[mean(gens),'Promedio general',col(mean(gens))],[l.length,'Alumnos'],[apG+'%','Aprobación general',col(apG>=80?16:apG>=60?14:12)],[ries,'Alumnos en riesgo',ries?CLRB:''],[avance+'%','Avance del registro']])+
+  `<div class="card" style="border-left:4px solid var(--ind)"><b style="font-family:inherit">Hallazgos clave</b><ul style="margin:8px 0 0;padding-left:20px;line-height:1.7;font-family:'Segoe UI',Arial;font-size:.88rem">${ins.map(i=>`<li>${i}</li>`).join('')}</ul></div>
+  <div class="card"><b style="font-family:inherit">Promedio por curso</b> <span class="sub">(clic en un curso para ver su detalle)</span><div style="margin-top:10px">${bars(CURSOS.map(c=>{const st=stat(vals(l,c,b));return{l:c,v:st.avg,s:st.n?st.ap+'% aprob.':'',t:`${c}: ${st.n} alumnos, ${st.fail} desaprobados`,a:`data-gc="${esc(c)}"`};}))}</div></div>
+  <div class="card"><b style="font-family:inherit">Mapa de calor: grado × curso</b> <span class="sub">(rojo = desaprobado, verde = alto rendimiento)</span><div style="margin-top:10px">${heat(b)}</div></div>`;
+}
+const CLRB='#d6455a';
+
+function aCursos(){
+  const l=lst(),b=AF().b,c=CURSOS.includes(window._ac)?window._ac:CURSOS[0];
+  const f=filtBar({x:`<div><label>Curso</label><select id="acSel">${CURSOS.map(x=>`<option ${x===c?'selected':''}>${esc(x)}</option>`).join('')}</select></div>`});
+  const pri=st=>!st.n?['Sin datos','']:(st.avg<APROB||st.ap<60)?['Alta','bad']:(st.ap<80||st.avg<15)?['Media','mid']:['Baja','ok'];
+  const rows=CURSOS.map(x=>({x,st:stat(vals(l,x,b)),w:weak(l,x,b)}));
+  const tbl=`<div style="overflow-x:auto"><table><thead><tr><th>Curso</th><th>Prom.</th><th>% aprob.</th><th>Desaprob.</th><th>Mín–Máx</th><th>Desv.</th><th>Componente débil</th><th>Prioridad de mejora</th></tr></thead><tbody>${rows.map(({x,st,w})=>{const p=pri(st);return `<tr data-gc="${esc(x)}" style="cursor:pointer;${x===c?'background:#eef1ff':''}"><td><b>${esc(x)}</b></td><td>${st.avg??'—'}</td><td>${st.ap??'—'}${st.n?'%':''}</td><td>${st.n?st.fail:'—'}</td><td>${st.min??'—'}–${st.max??'—'}</td><td>${st.sd??'—'}</td><td>${w?w.l+' ('+w.v+')':'—'}</td><td><span class="pill ${p[1]}">${p[0]}</span></td></tr>`}).join('')}</tbody></table></div>`;
+  const a=vals(l,c,b),st=stat(a);
+  if(!st.n)return f+`<div class="card"><b style="font-family:inherit">Comparativo de cursos</b>${tbl}</div>`+empty();
+  const rk=l.map(s=>({s,v:pcs(s.id,c,b)})).filter(x=>x.v!==null).sort((p,q)=>q.v-p.v);
+  const li=arr=>arr.map(x=>`<tr data-gs="${x.s.id}" style="cursor:pointer"><td>${esc(x.s.nombre)}</td><td>${x.s.grado}°</td><td class="${estadoClass(x.v)}">${x.v}</td></tr>`).join('');
+  const gs=AF().g==='all'?grados():[AF().g];
+  return f+`<div class="card"><b style="font-family:inherit">Comparativo de cursos</b> <span class="sub">(prioridad: Alta si prom. &lt; ${APROB} o aprobación &lt; 60%)</span>${tbl}</div>
+  <h3>Detalle de ${esc(c)}</h3>${kpi([[st.avg,'Promedio',col(st.avg)],[st.ap+'%','Aprobación'],[st.fail,'Desaprobados',st.fail?CLRB:''],[st.max,'Nota más alta'],[st.min,'Nota más baja']])}
+  <div class="card"><b style="font-family:inherit">Distribución de notas</b>${hist(a)}</div>
+  <div class="card"><b style="font-family:inherit">¿Qué componente jala hacia abajo?</b><div style="margin-top:10px">${bars(compsList().map(([k,n])=>({l:n,v:comp(l,c,b,k),t:n+' en '+c})))}</div></div>
+  <div class="card"><b style="font-family:inherit">Promedio por grado en ${esc(c)}</b><div style="margin-top:10px">${bars(gs.map(g=>{const s2=stat(vals(studentsOf(g),c,b));return{l:g+'° de Secundaria',v:s2.avg,s:s2.n?s2.ap+'% aprob.':''};}))}</div></div>
+  <div class="grid2"><div class="card"><b style="font-family:inherit">🏆 Mejores 5</b><table><tbody>${li(rk.slice(0,5))}</tbody></table></div>
+  <div class="card"><b style="font-family:inherit">⚠ Necesitan apoyo (5 más bajos)</b><table><tbody>${li(rk.slice(-5).reverse())}</tbody></table></div></div>`;
+}
+
+function aGrados(){
+  const b=AF().b,f=filtBar({g:false});
+  const rows=grados().map(g=>{const l=studentsOf(g),gens=l.map(s=>pgen(s.id,b)).filter(v=>v!==null),cs=CURSOS.map(c=>({c,...stat(vals(l,c,b))})).filter(x=>x.n).sort((p,q)=>p.avg-q.avg),rs=gens.filter(v=>v<APROB).length;return{g,n:l.length,avg:mean(gens),ap:gens.length?Math.round((gens.length-rs)/gens.length*100):null,rs,lo:cs[0],hi:cs[cs.length-1]};});
+  if(!rows.some(x=>x.avg!==null))return f+empty();
+  return f+`<div class="card"><b style="font-family:inherit">Promedio general por grado</b> <span class="sub">(clic para ver el resumen del grado)</span><div style="margin-top:10px">${bars(rows.map(x=>({l:x.g+'° de Secundaria',v:x.avg,s:x.ap!==null?x.ap+'% aprob.':'',t:`${x.n} alumnos · ${x.rs} en riesgo`,a:`data-gg="${x.g}"`})))}</div></div>
+  <div class="card"><b style="font-family:inherit">Comparativo por grado</b><div style="overflow-x:auto"><table><thead><tr><th>Grado</th><th>Alumnos</th><th>Prom.</th><th>Aprobados / desaprobados</th><th>En riesgo</th><th>Mejor curso</th><th>Curso a reforzar</th></tr></thead><tbody>${rows.map(x=>`<tr data-gg="${x.g}" style="cursor:pointer"><td><b>${x.g}°</b></td><td>${x.n}</td><td class="${estadoClass(x.avg)}">${x.avg??'—'}</td><td><div style="display:flex;height:12px;min-width:120px;border-radius:3px;overflow:hidden;background:#eee" data-tip="${x.ap??0}% aprobados"><i style="width:${x.ap??0}%;background:#2f6b4a"></i><i style="flex:1;background:${x.ap===null?'#eee':'#B4443D'}"></i></div></td><td>${x.rs}</td><td>${x.hi?esc(x.hi.c)+' ('+x.hi.avg+')':'—'}</td><td>${x.lo?esc(x.lo.c)+' ('+x.lo.avg+')':'—'}</td></tr>`).join('')}</tbody></table></div></div>
+  <div class="card"><b style="font-family:inherit">Mapa de calor: grado × curso</b><div style="margin-top:10px">${heat(b)}</div></div>`;
+}
+
+function aAlumno(){
+  const all=[...DATA.students].sort((a,b)=>a.grado-b.grado||a.nombre.localeCompare(b.nombre));
+  if(!all.length)return empty('Sin alumnos.');
+  const s=all.find(x=>x.id===window._as)||all[0],b=AF().b,peers=studentsOf(s.grado);
+  const sel=`<div><label>Alumno</label><select id="asSel">${grados().map(g=>`<optgroup label="${g}° de Secundaria">${all.filter(x=>x.grado===g).map(x=>`<option value="${x.id}" ${x.id===s.id?'selected':''}>${esc(x.nombre)}</option>`).join('')}</optgroup>`).join('')}</select></div>`;
+  const f=filtBar({g:false,x:sel}),gen=pgen(s.id,b);
+  if(gen===null)return f+empty('Este alumno aún no tiene notas para el bimestre elegido.');
+  const rank=peers.map(p=>pgen(p.id,b)).filter(v=>v!==null).sort((x,y)=>y-x),pos=rank.indexOf(gen)+1;
+  const cs=CURSOS.map(c=>({c,v:pcs(s.id,c,b)})).filter(x=>x.v!==null).sort((x,y)=>x.v-y.v),bad=cs.filter(x=>x.v<APROB).length;
+  const S=CURSOS.map((c,i)=>({n:c,c:PAL[i%PAL.length],d:BIMS.map(x=>promAlumnoCurso(s.id,c,x))}));S.push({n:'General',c:'#000',w:3.5,d:BIMS.map(x=>promAlumnoGeneral(s.id,x))});
+  return f+kpi([[gen,'Promedio general',col(gen)],['#'+pos+' de '+rank.length,'Puesto en '+s.grado+'°'],[bad,'Cursos desaprobados',bad?CLRB:''],[mean(rank),'Promedio del grado']])+
+  `<div class="card"><b style="font-family:inherit">Fortaleza y debilidad</b><div class="sub" style="margin:6px 0 0">Mayor fortaleza: <b>${esc(cs[cs.length-1].c)}</b> (${cs[cs.length-1].v}) · Curso a reforzar: <b>${esc(cs[0].c)}</b> (${cs[0].v})</div></div>
+  <div class="card"><b style="font-family:inherit">Notas por curso vs. promedio del grado</b><div style="margin-top:10px">${bars(CURSOS.map(c=>({l:c,v:pcs(s.id,c,b),s:'grado: '+(mean(vals(peers,c,b))??'—'),t:c})))}</div></div>
+  <div class="card"><b style="font-family:inherit">Evolución por bimestre</b> <span class="sub">(clic en la leyenda para ocultar líneas)</span>${line(S,BIMS.map(x=>BIM_LABEL[x]))}</div>`;
+}
+
+function aRiesgo(){
+  const l=lst(),b=AF().b,f=filtBar();
+  const rows=l.map(s=>({s,gen:pgen(s.id,b),bad:CURSOS.map(c=>({c,v:pcs(s.id,c,b)})).filter(x=>x.v!==null&&x.v<APROB)})).filter(x=>x.gen!==null);
+  if(!rows.length)return f+empty();
+  const lv=x=>x.bad.length>=3||x.gen<APROB?['Alto','bad']:x.bad.length===2?['Medio','mid']:['Leve','mid'];
+  const risk=rows.filter(x=>x.bad.length||x.gen<APROB).sort((p,q)=>q.bad.length-p.bad.length||p.gen-q.gen);
+  const honor=[...rows].sort((p,q)=>q.gen-p.gen).slice(0,10);
+  return f+kpi([[risk.length,'Alumnos con alerta',risk.length?CLRB:''],[risk.filter(x=>lv(x)[0]==='Alto').length,'Riesgo alto',CLRB],[Math.round(risk.length/rows.length*100)+'%','Del total evaluado']])+
+  `<div class="card"><b style="font-family:inherit">Alumnos que necesitan apoyo</b> <span class="sub">(Alto: 3+ cursos desaprobados o promedio general &lt; ${APROB}; clic para ver su perfil)</span>${risk.length?`<div style="overflow-x:auto"><table><thead><tr><th>Alumno</th><th>Grado</th><th>Prom. gen.</th><th>Cursos desaprobados</th><th>Riesgo</th></tr></thead><tbody>${risk.map(x=>`<tr data-gs="${x.s.id}" style="cursor:pointer"><td>${esc(x.s.nombre)}</td><td>${x.s.grado}°</td><td class="${estadoClass(x.gen)}">${x.gen}</td><td>${x.bad.map(y=>`<span class="pill bad" style="margin-right:4px">${esc(y.c)} ${y.v}</span>`).join('')}</td><td><span class="pill ${lv(x)[1]}">${lv(x)[0]}</span></td></tr>`).join('')}</tbody></table></div>`:empty('Ningún alumno con alerta 🎉')}</div>
+  <div class="card"><b style="font-family:inherit">🏆 Cuadro de mérito (top 10)</b><table><thead><tr><th>#</th><th>Alumno</th><th>Grado</th><th>Prom. gen.</th></tr></thead><tbody>${honor.map((x,i)=>`<tr data-gs="${x.s.id}" style="cursor:pointer"><td>${i+1}</td><td>${esc(x.s.nombre)}</td><td>${x.s.grado}°</td><td class="aprob">${x.gen}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
+function aTend(){
+  const l=lst(),f=filtBar({b:false});
+  const S=CURSOS.map((c,i)=>({n:c,c:PAL[i%PAL.length],d:BIMS.map(x=>mean(vals(l,c,x)))}));
+  S.push({n:'General',c:'#000',w:3.5,d:BIMS.map(x=>mean(l.map(s=>pgen(s.id,x)).filter(v=>v!==null)))});
+  if(!S.some(s=>s.d.some(v=>v!==null)))return f+empty();
+  return f+`<div class="card"><b style="font-family:inherit">Evolución del promedio por bimestre</b> <span class="sub">(clic en la leyenda para ocultar líneas)</span>${line(S,BIMS.map(x=>BIM_LABEL[x]))}</div>
+  <div class="card"><b style="font-family:inherit">Variación entre bimestres</b><div style="overflow-x:auto"><table><thead><tr><th>Curso</th>${BIMS.map(x=>`<th>${BIM_LABEL[x]}</th>`).join('')}<th>Variación</th></tr></thead><tbody>${S.map(s=>{const nn=s.d.filter(v=>v!==null),d=nn.length>1?r2(nn[nn.length-1]-nn[0]):null;return `<tr><td><b>${esc(s.n)}</b></td>${s.d.map(v=>`<td>${v??'—'}</td>`).join('')}<td class="${d>0?'aprob':d<0?'desaprob':''}">${d===null?'—':(d>0?'▲ +':d<0?'▼ ':'= ')+d}</td></tr>`}).join('')}</tbody></table></div></div>`;
+}
+
+function wireAn(){
+  const m=document.getElementById('main');if(!m)return;
+  const on=(id,fn)=>{const e=document.getElementById(id);if(e)e.onchange=()=>{fn(e.value);render();};};
+  on('afG',v=>AF().g=v==='all'?'all':Number(v));
+  on('afB',v=>AF().b=v==='all'?'all':Number(v));
+  on('acSel',v=>window._ac=v);on('asSel',v=>window._as=v);
+  m.querySelectorAll('[data-lg]').forEach(x=>x.onclick=()=>{const h=window._hide=window._hide||{};h[x.dataset.lg]=!h[x.dataset.lg];render();});
+  m.querySelectorAll('[data-gc],[data-gs],[data-gg]').forEach(el=>el.onclick=()=>{
+    if(el.dataset.gg)AF().g=Number(el.dataset.gg);
+    if(el.dataset.gc){window._ac=el.dataset.gc;window._am='cursos';}
+    else if(el.dataset.gs){window._as=el.dataset.gs;window._am='alumnos';}
+    else window._am='resumen';
+    render();window.scrollTo(0,0);});
+}
+(function(){const t=document.createElement('div');t.style.cssText="position:fixed;z-index:9998;background:#1B2A41;color:#fff;padding:6px 10px;border-radius:4px;font:12px 'Segoe UI',Arial;pointer-events:none;display:none;max-width:260px";document.body.appendChild(t);
+document.addEventListener('mousemove',e=>{const el=e.target.closest&&e.target.closest('[data-tip]');if(!el||!el.dataset.tip){t.style.display='none';return;}t.textContent=el.dataset.tip;t.style.display='block';t.style.left=Math.max(6,Math.min(e.clientX+14,innerWidth-270))+'px';t.style.top=(e.clientY+14)+'px';});})();
 
 function viewReportes(){
   const gs=grados();
   const modo=window._rm||'curso';
   let body='';
   if(modo==='curso'){
-    const g=window._repG||gs[0], curso=window._repC||CURSOS[0], bim=window._repB||3;
+    const g=window._repG||gs[0], curso=(CURSOS.includes(window._repC)?window._repC:CURSOS[0]), bim=window._repB||3;
     const list=studentsOf(g);
     const rows=list.map((s,i)=>{
       const r=getRec(s.id,curso,bim);
-      const cu=r?avg2(r.cN1,r.cN2):null, li=r?avg2(r.lN1,r.lN2):null, co=r?avg2(r.conN1,r.conN2):null;
       const prom=promAlumnoCurso(s.id,curso,bim);
       const estado=prom===null?'—':(prom>=APROB?'Aprobado':'Desaprobado');
-      return `<tr><td>${i+1}</td><td>${esc(s.nombre)}</td><td>${cu??'—'}</td><td>${li??'—'}</td><td>${co??'—'}</td>
-      <td>${r?.exM??'—'}</td><td>${r?.exB??'—'}</td><td class="${estadoClass(prom)}">${prom??'—'}</td><td class="${estadoClass(prom)}">${estado}</td></tr>`;
+      return `<tr><td>${i+1}</td><td>${esc(s.nombre)}</td>${groups().map(g=>`<td>${gval(r,g)??'—'}</td>`).join('')}<td class="${estadoClass(prom)}">${prom??'—'}</td><td class="${estadoClass(prom)}">${estado}</td></tr>`;
     }).join('');
     body=`<div class="row no-print">
       <div><label>Grado</label><select id="repG">${gs.map(x=>`<option value="${x}" ${x==g?'selected':''}>${x}°</option>`).join('')}</select></div>
@@ -474,7 +983,7 @@ function viewReportes(){
       <button class="btn ghost" id="printBtn">Imprimir / Guardar PDF</button>
     </div>
     <div class="rpt-head"><h3>Registro Auxiliar de ${esc(curso)}</h3><div class="sub">${BIM_LABEL[bim]} Bimestre — ${g}° de Secundaria · Colegio Los Ángeles de Jesús</div></div>
-    ${list.length?`<table><thead><tr><th>N°</th><th>Alumno</th><th>Cuaderno</th><th>Libro</th><th>Conducta</th><th>Ex. Mensual</th><th>Ex. Bimestral</th><th>Promedio</th><th>Estado</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">Sin alumnos en ese grado.</div>'}`;
+    ${list.length?`<table><thead><tr><th>N°</th><th>Alumno</th>${groups().map(g=>`<th>${esc(g.label)}</th>`).join('')}<th>Promedio</th><th>Estado</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">Sin alumnos en ese grado.</div>'}`;
   }else{
     const g=window._repGG||gs[0], bim=window._repGB||3;
     const list=studentsOf(g);
@@ -492,7 +1001,7 @@ function viewReportes(){
     ${list.length?`<table><thead><tr><th>N°</th><th>Alumno</th>${CURSOS.map(c=>`<th>${esc(c)}</th>`).join('')}<th>Prom. Gen.</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">Sin alumnos en ese grado.</div>'}`;
   }
   return `<h2>Reportes</h2><div class="sub no-print">Genera el registro por curso o el consolidado por grado, listos para imprimir o exportar a PDF.</div>
-  <div class="card no-print"><b style="font-family:Georgia,serif">Reporte completo en PDF</b>
+  <div class="card no-print"><b style="font-family:inherit">Reporte completo en PDF</b>
     <div class="sub" style="margin:6px 0 12px">Descarga en un solo archivo el consolidado de todos los grados y los registros de todos los cursos.</div>
     <div class="row" style="margin-bottom:0">
       <div><label>Bimestre</label><select id="repFullB">${BIMS.map(b=>`<option value="${b}" ${b==(window._repFB||3)?'selected':''}>${BIM_LABEL[b]}</option>`).join('')}</select></div>
@@ -517,14 +1026,34 @@ function wire(){
     render();
   };
   m.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{
-    if(!confirm('¿Eliminar este alumno y sus notas?'))return;
+    if(!confirm('¿Eliminar este alumno y sus notas de TODAS las áreas? Esta acción no se puede deshacer.'))return;
     await deleteStudentRemote(b.dataset.del); render();
   });
   const rGrado=document.getElementById('rGrado'), rCurso=document.getElementById('rCurso'), rBim=document.getElementById('rBim');
   [rGrado,rCurso,rBim].forEach(el=>{if(!el)return;el.onchange=()=>{
     window._rg=Number(rGrado.value); window._rc=rCurso.value; window._rb=Number(rBim.value); render();
   };});
+  /* Navegación con flechas entre celdas */
+  const notaRows=[...m.querySelectorAll('tbody tr')].map(tr=>[...tr.querySelectorAll('.nota-in')]).filter(r=>r.length);
+  notaRows.forEach((fila,ri)=>fila.forEach((inp,ci)=>{
+    inp.addEventListener('focus',()=>setTimeout(()=>inp.select(),0));
+    inp.addEventListener('keydown',e=>{
+      let nr=ri,nc=ci;
+      if(e.key==='ArrowUp')nr--;
+      else if(e.key==='ArrowDown'||e.key==='Enter')nr++;
+      else if(e.key==='ArrowLeft')nc--;
+      else if(e.key==='ArrowRight')nc++;
+      else return;
+      e.preventDefault();
+      const t=notaRows[nr]&&notaRows[nr][nc];
+      if(t){t.focus();}
+    });
+  }));
   m.querySelectorAll('.nota-in').forEach(inp=>inp.addEventListener('input',()=>{
+    let v=inp.value.replace(',','.').replace(/[^0-9.]/g,'');
+    const dot=v.indexOf('.'); if(dot>=0)v=v.slice(0,dot+1)+v.slice(dot+1).replace(/\./g,'');
+    if(v!==''&&Number(v)>20)v='20';
+    if(v!==inp.value)inp.value=v;
     const sid=inp.dataset.sid;
     const fila=[...m.querySelectorAll('.nota-in')].filter(x=>x.dataset.sid===sid);
     const llenos=fila.filter(x=>x.value!=='').length;
@@ -540,7 +1069,7 @@ function wire(){
   }));
   const sg=document.getElementById('saveGrades');
   if(sg)sg.onclick=async()=>{
-    const g=window._rg||grados()[0], curso=window._rc||CURSOS[0], bim=window._rb||3;
+    const g=window._rg||grados()[0], curso=(CURSOS.includes(window._rc)?window._rc:CURSOS[0]), bim=window._rb||3;
     sg.textContent='Guardando...'; sg.disabled=true;
     const list=studentsOf(g);
     m.querySelectorAll('.nota-in').forEach(inp=>setField(inp.dataset.sid,curso,bim,inp.dataset.field,inp.value));
@@ -562,43 +1091,20 @@ function wire(){
   [repGG,repGB].forEach(el=>{if(!el)return;el.onchange=()=>{window._repGG=Number(repGG.value);window._repGB=Number(repGB.value);render();};});
   const pb=document.getElementById('printBtn');if(pb)pb.onclick=()=>window.print();
   const pb2=document.getElementById('printBtn2');if(pb2)pb2.onclick=()=>window.print();
-  m.querySelectorAll('[data-rmode]').forEach(b=>b.onclick=()=>{
-    if(window._dirtyAl&&!confirm('Tienes notas sin guardar. ¿Cambiar de vista y descartarlas?'))return;
-    window._dirtyAl=false;window._regMode=b.dataset.rmode;render();
-  });
-  const raG=document.getElementById('raGrado'),raS=document.getElementById('raSid'),raB=document.getElementById('raBim');
-  [raG,raS,raB].forEach(el=>{if(!el)return;el.onchange=()=>{
-    if(window._dirtyAl&&!confirm('Tienes notas sin guardar. ¿Cambiar y descartarlas?')){render();return;}
-    window._dirtyAl=false;
-    window._ra_sid=(el===raG)?null:raS.value;
-    window._ra_g=Number(raG.value);window._ra_b=Number(raB.value);render();
-  };});
-  const inAl=m.querySelectorAll('.nota-al');
-  inAl.forEach(inp=>inp.addEventListener('input',()=>{
-    window._dirtyAl=true;
-    const c=inp.dataset.curso;
-    const fila=[...inAl].filter(x=>x.dataset.curso===c);
-    const p=Math.round(fila.filter(x=>x.value!=='').length/fila.length*100);
-    const cell=document.getElementById('pa-'+CURSOS.indexOf(c));
-    if(cell){cell.textContent=p+'%';cell.style.color=pctColor(p);}
-  }));
-  const sa=document.getElementById('saveAlumno');
-  if(sa)sa.onclick=async()=>{
-    const sid=window._ra_sid,bim=window._ra_b||3;
-    sa.textContent='Guardando...';sa.disabled=true;
-    inAl.forEach(inp=>setField(sid,inp.dataset.curso,bim,inp.dataset.field,inp.value));
-    for(const c of CURSOS){await upsertGradeRow(sid,c,bim);}
-    window._dirtyAl=false;
-    sa.textContent='Guardado ✓';setTimeout(()=>render(),500);
-  };
-  const pdG=document.getElementById('pdGrado'),pdB=document.getElementById('pdBim');
-  [pdG,pdB].forEach(el=>{if(!el)return;el.onchange=()=>{window._pg=Number(pdG.value);window._pb=Number(pdB.value);render();};});
-  const pdfP=document.getElementById('pdfPend');
-  if(pdfP)pdfP.onclick=()=>descargarPendientesPdf(window._pg||grados()[0],window._pb||3);
   const fB=document.getElementById('repFullB');if(fB)fB.onchange=()=>{window._repFB=Number(fB.value);};
   const fBtn=document.getElementById('fullPdfBtn');if(fBtn)fBtn.onclick=()=>descargarReporteCompleto(Number(document.getElementById('repFullB').value));
+  wireAn();wireReg();wireAdmin();
   const exBtn=document.getElementById('exportXlsx');if(exBtn)exBtn.onclick=exportExcel;
-  const imIn=document.getElementById('importXlsx');if(imIn)imIn.onchange=e=>importExcel(e.target.files[0]);
+  const imIn=document.getElementById('importXlsx'), upBtn=document.getElementById('updateDbBtn');
+  if(imIn&&upBtn){
+    imIn.onchange=()=>{
+      window._importFile=imIn.files[0]||null;
+      upBtn.disabled=!window._importFile;
+      const im=document.getElementById('importMsg');
+      if(im)im.textContent=window._importFile?`Archivo seleccionado: ${window._importFile.name}. Presiona "Actualizar base de datos" para subirlo.`:'';
+    };
+    upBtn.onclick=()=>importExcel(window._importFile);
+  }
 }
 
 function exportExcel(){
@@ -606,7 +1112,7 @@ function exportExcel(){
   const alumRows=[['N°','Nombre','Grado']];
   DATA.students.forEach((s,i)=>alumRows.push([i+1,s.nombre,GRADO_LABEL[s.grado]||s.grado]));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(alumRows),'Alumnos');
-  const notasHead=['Bimestre','Grado','Curso','Alumno','Cuaderno N1','Cuaderno N2','Libro N1','Libro N2','Conducta N1','Conducta N2','Examen Mensual','Examen Bimestral','Promedio','Estado'];
+  const notasHead=['Bimestre','Grado','Curso','Alumno',...acols().map(c=>c.name),'Promedio','Estado'];
   const notasRows=[notasHead];
   DATA.students.forEach(s=>{
     CURSOS.forEach(c=>{
@@ -615,12 +1121,12 @@ function exportExcel(){
         if(!r)return;
         const prom=computeProm(r);
         const estado=prom===null?'':(prom>=APROB?'Aprobado':'Desaprobado');
-        notasRows.push([b,GRADO_LABEL[s.grado]||s.grado,c,s.nombre,r.cN1,r.cN2,r.lN1,r.lN2,r.conN1,r.conN2,r.exM,r.exB,prom,estado]);
+        notasRows.push([b,GRADO_LABEL[s.grado]||s.grado,c,s.nombre,...acols().map(k=>r[k.id]),prom,estado]);
       });
     });
   });
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(notasRows),'Notas');
-  XLSX.writeFile(wb,'Notas_Los_Angeles_de_Jesus.xlsx');
+  XLSX.writeFile(wb,'Notas_'+AREA.name.replace(/\s+/g,'_')+'_Los_Angeles_de_Jesus.xlsx');
 }
 
 function parseGradoNum(v){ const m=String(v).match(/\d+/); return m?Number(m[0]):null; }
@@ -630,35 +1136,64 @@ async function findOrCreateStudentRemote(nombre,grado){
   if(!s){ const id=await insertStudent(String(nombre).trim(),grado); s=DATA.students.find(x=>x.id===id); }
   return s;
 }
+function showLoading(msg){
+  let o=document.getElementById('loadingOverlay');
+  if(!o){o=document.createElement('div');o.id='loadingOverlay';o.className='overlay';
+    o.innerHTML='<div class="box"><div class="spinner"></div><div id="loadingMsg" style="font-weight:600;color:#1B2A41"></div><div id="loadingSub" style="font-size:.82rem;color:#777;margin-top:6px"></div><div class="progress"><i id="loadingBar"></i></div></div>';
+    document.body.appendChild(o);}
+  document.getElementById('loadingMsg').textContent=msg;
+}
+function setLoading(sub,pct){
+  const a=document.getElementById('loadingSub'),b=document.getElementById('loadingBar');
+  if(a)a.textContent=sub||''; if(b&&pct!==undefined)b.style.width=pct+'%';
+}
+function hideLoading(){const o=document.getElementById('loadingOverlay');if(o)o.remove();}
+
 async function importExcel(file){
   if(!file)return;
+  showLoading('Actualizando base de datos...');
+  setLoading('Leyendo el archivo...',3);
   try{
     const buf=await file.arrayBuffer();
     const wb=XLSX.read(buf,{type:'array'});
     const sheetName=wb.SheetNames.find(n=>n.toLowerCase()==='notas')||wb.SheetNames[0];
     const ws=wb.Sheets[sheetName];
     const rows=XLSX.utils.sheet_to_json(ws,{defval:null});
-    let n=0;
+    const clean=v=>(v===null||v===undefined||v==='')?null:Number(v);
+    const total=rows.length||1;
+    const batch=new Map();
+    let n=0,i=0;
     for(const r of rows){
+      i++;
       const alumno=r['Alumno']; const grado=parseGradoNum(r['Grado']); const curso=r['Curso']; const bim=Number(r['Bimestre']);
-      if(!alumno||!grado||!curso||!bim)continue;
+      if(!alumno||!grado||!curso||!bim||!CURSOS.includes(curso))continue;
       const s=await findOrCreateStudentRemote(alumno,grado);
-      const clean=v=>(v===null||v===undefined||v==='')?null:Number(v);
+      if(!s)continue;
       DATA.records[s.id]=DATA.records[s.id]||{};
       DATA.records[s.id][curso]=DATA.records[s.id][curso]||{};
-      DATA.records[s.id][curso][bim]={
-        cN1:clean(r['Cuaderno N1']),cN2:clean(r['Cuaderno N2']),
-        lN1:clean(r['Libro N1']),lN2:clean(r['Libro N2']),
-        conN1:clean(r['Conducta N1']),conN2:clean(r['Conducta N2']),
-        exM:clean(r['Examen Mensual']),exB:clean(r['Examen Bimestral'])
-      };
-      await upsertGradeRow(s.id,curso,bim);
+      const rec={...(DATA.records[s.id][curso][bim]||{})};
+      AREA.cols.forEach(c=>{const key=[c.name,c.x].find(k=>k&&(k in r));if(key!==undefined)rec[c.id]=clean(r[key]);});
+      DATA.records[s.id][curso][bim]=rec;
+      batch.set(s.id+'|'+curso+'|'+bim,{sid:s.id,area:AREA.id,curso,bim,scores:rec});
       n++;
+      if(i%5===0){setLoading(`Procesando alumnos: fila ${i} de ${rows.length}`,3+Math.round(i/total*47));await new Promise(r=>setTimeout(r,0));}
     }
+    const all=[...batch.values()];
+    const CH=200;
+    for(let k=0;k<all.length;k+=CH){
+      const chunk=all.slice(k,k+CH);
+      setLoading(`Guardando notas en la nube: ${Math.min(k+CH,all.length)} de ${all.length}`,50+Math.round(Math.min(k+CH,all.length)/all.length*50));
+      const {error}=await sb.from('grades').upsert(chunk,{onConflict:'sid,area,curso,bim'});
+      if(error)throw new Error(error.message);
+    }
+    setLoading('Listo',100);
+    hideLoading();
+    window._importFile=null;
     window._importMsg=`Importación completa: ${n} registros de notas actualizados en la nube.`;
     render();
   }catch(e){
-    window._importMsg='No se pudo leer ese archivo. Verifica que tenga una hoja "Notas" con las columnas Bimestre, Grado, Curso, Alumno y las notas.';
+    hideLoading();
+    window._importMsg='No se pudo actualizar la base de datos. Verifica que el archivo tenga una hoja "Notas" con las columnas Bimestre, Grado, Curso, Alumno y las notas.'+(e&&e.message?' ('+e.message+')':'');
     render();
   }
 }
@@ -673,7 +1208,7 @@ function descargarReporteCompleto(bim){
     doc.setFont('helvetica','bold');doc.setFontSize(15);doc.setTextColor(...NAVY);doc.text(t,148.5,15,{align:'center'});
     doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(90,90,90);doc.text(s,148.5,21,{align:'center'});
   };
-  const base={theme:'grid',headStyles:{fillColor:NAVY,halign:'center',fontSize:8},styles:{fontSize:8.5,cellPadding:1.8,lineColor:[216,210,194],textColor:[32,35,43]},alternateRowStyles:{fillColor:[236,231,218]},margin:{left:14,right:14}};
+  const base={theme:'grid',headStyles:{fillColor:[236,231,218],textColor:[68,68,68],fontStyle:'bold',halign:'center',fontSize:8,lineColor:[216,210,194]},styles:{fontSize:8.5,cellPadding:1.8,lineColor:[216,210,194],textColor:[32,35,43],fillColor:[255,255,255]},margin:{left:14,right:14}};
   const gs=grados();
   let first=true;
 
@@ -706,15 +1241,15 @@ function descargarReporteCompleto(bim){
         const r=getRec(s.id,c,bim);
         const prom=computeProm(r);
         const estado=prom===null?'-':(prom>=APROB?'Aprobado':'Desaprobado');
-        return [i+1,s.nombre,fmt(r?avg2(r.cN1,r.cN2):null),fmt(r?avg2(r.lN1,r.lN2):null),fmt(r?avg2(r.conN1,r.conN2):null),fmt(r?r.exM:null),fmt(r?r.exB:null),fmt(prom),estado];
+        return [i+1,s.nombre,...groups().map(g=>fmt(gval(r,g))),fmt(prom),estado];
       });
-      doc.autoTable({...base,startY:y+2,head:[['N°','Alumno','Cuaderno','Libro','Conducta','Ex. Mensual','Ex. Bimestral','Promedio','Estado']],body,
+      doc.autoTable({...base,startY:y+2,head:[['N°','Alumno',...groups().map(g=>g.label),'Promedio','Estado']],body,
         styles:{...base.styles,fontSize:8,cellPadding:1.4},
         columnStyles:{0:{halign:'center',cellWidth:10},1:{cellWidth:62}},
         didParseCell:d=>{
           if(d.section==='body'&&d.column.index>=2){
             d.cell.styles.halign='center';
-            if(d.column.index===8){
+            if(d.column.index===groups().length+3){
               if(d.cell.raw==='Aprobado')d.cell.styles.textColor=GREEN;
               else if(d.cell.raw==='Desaprobado')d.cell.styles.textColor=RED;
             }
@@ -730,7 +1265,7 @@ function descargarReporteCompleto(bim){
 /* ---------- Arranque ---------- */
 (async function start(){
   const {data:{session:s}}=await sb.auth.getSession();
-  if(s){ session=s; await loadAllData(); render(); }
+  if(s){ session=s; if(await afterLogin()) render(); }
   else { renderLogin(); }
 })();
 </script>
